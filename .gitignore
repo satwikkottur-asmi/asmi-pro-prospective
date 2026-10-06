@@ -1,17 +1,13 @@
 # Dependencies & build output
 node_modules
 dist
-dist-ssr
-.output
-.nitro
-.tanstack
+.output/
 .wrangler/
 
 # Env
 .env
 .env.*
 !.env.example
-.dev.vars
 
 # Logs
 *.log

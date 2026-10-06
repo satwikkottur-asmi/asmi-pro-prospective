@@ -6,7 +6,7 @@ import tseslint from "typescript-eslint";
 
 // Lint only; formatting is Biome's job (see biome.json).
 export default tseslint.config(
-  { ignores: ["dist", ".output", "src/routeTree.gen.ts"] },
+  { ignores: ["dist"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

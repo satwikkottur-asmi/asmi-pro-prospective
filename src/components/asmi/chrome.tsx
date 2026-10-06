@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 import logo from "@/assets/asmi-mark-ink.png";
 import { SUPPORT_EMAIL, SUPPORT_TEXT_NUMBER } from "@/config";
 import { useApp } from "@/lib/app-context";
