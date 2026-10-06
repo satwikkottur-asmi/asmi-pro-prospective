@@ -74,7 +74,6 @@ export function getAttribution(): Attribution {
 let ctxSnapshot = { variant: "a" as Variant, lang: "en" as Lang };
 
 export function track(name: string, meta: Record<string, unknown> = {}) {
-  if (typeof window === "undefined") return;
   try {
     const attr = getAttribution();
     postEvent({

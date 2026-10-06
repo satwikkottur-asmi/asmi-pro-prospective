@@ -265,7 +265,7 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     }
   }
 
-  const base = SITE_URL || (typeof window !== "undefined" ? window.location.origin : "");
+  const base = SITE_URL || window.location.origin;
   const shareUrl = saved?.ref_code ? `${base}/?ref=${saved.ref_code}` : `${base}/`;
 
   async function copy() {
