@@ -7,25 +7,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 - "Asmi for Pros" waitlist landing page for home-service pros (bilingual en/es)
-- TanStack Start (React 19, SSR) on plain Vite; builds to a Cloudflare Worker via Nitro
+- Plain Vite + React 19 SPA with React Router; static build deployed on Vercel
 - Frontend only: waitlist API is an external backend (contract: `docs/api.md`)
-- Formerly a Lovable + Supabase project; both fully removed
+- Formerly a Lovable + Supabase + TanStack Start (SSR) project; all removed
 
 ## Commands
 
 - `npm run dev` — dev server
-- `npm run build` — production build (`.output/`)
+- `npm run build` — production build (`dist/`)
 - `npm run check` — typecheck + eslint + biome format check + vitest
 - `npm run format` — Biome format + organize imports (also runs as a pre-commit hook via `.pre-commit-config.yaml`)
-- Single test: `npx vitest run src/test/waitlist-counts.test.ts` (add `-t "<name>"` to filter)
+- Single test: `npx vitest run src/test/app-routing.test.tsx` (add `-t "<name>"` to filter)
 
 ## Architecture
 
-- **Routing** — file-based under `src/routes/` (see `src/routes/README.md`)
-  - `__root.tsx`: head/fonts, `StatusPage` for 404 + error boundaries, wraps app in `AppProvider`
-  - `index.tsx` (landing), `join.tsx` (standalone signup); shared head tags via `pageMeta()` in `src/lib/seo.ts`
-  - `routeTree.gen.ts` is generated — never hand-edit
-- **Server entry** — `src/server.ts` wraps the SSR handler with a static error page; `src/start.ts` adds error + CSRF middleware
+- **Entry** — `index.html` (static meta/OG tags, fonts, hero preload) → `src/main.tsx` (QueryClient + `createBrowserRouter`)
+- **Routing** — `src/routes.tsx` (React Router data routes); page/shell components in `src/components/asmi/pages.tsx`
+  - `RootLayout`: feeds URL params to `AppProvider`, restores scroll; `RouteError` + `NotFound` render `StatusPage`
+  - `/` → `Landing`, `/join` → standalone `SignupFlow`, `*` → 404
+  - `vercel.json` rewrites every path to `index.html` so deep links work
+  - Page `<title>` follows the language (`dict.meta.title`, set in `app-context.tsx`)
 - **App state** — `src/lib/app-context.tsx`
   - URL params: `v` (a/b/c variant; `src=fb`→c, `src=door`→b), `lang`, `city` (`sf`/`la`/`ny`…), `ref`, `utm_*`
   - First-touch attribution in `sessionStorage` (`asmi_attr`) → sent with stage-1 signup
