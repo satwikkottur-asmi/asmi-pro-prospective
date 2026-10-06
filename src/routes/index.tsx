@@ -1,25 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import heroBase from "@/assets/scene-hero3-base.webp";
 import { Landing } from "@/components/asmi/landing";
-import heroBase from "@/assets/scene-hero3-base.webp.asset.json";
-
-const OG = heroBase.url;
-const TITLE = "Asmi for Pros: same hours, more paid jobs";
-const DESC =
-  "Paid jobs with no lead fees, plus help with office work by text or voice in 30+ languages for home service pros.";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: OG },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: OG },
-    ],
-    links: [{ rel: "preload", as: "image", href: heroBase.url, fetchPriority: "high" }],
+    meta: pageMeta({
+      title: "Asmi for Pros: same hours, more paid jobs",
+      description:
+        "Paid jobs with no lead fees, plus help with office work by text or voice in 30+ languages for home service pros.",
+    }),
+    links: [{ rel: "preload", as: "image", href: heroBase, fetchPriority: "high" }],
   }),
   component: Landing,
 });
