@@ -11,8 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JoinRouteImport } from './routes/join'
-import { Route as ApiPublicSignupRouteImport } from './routes/api/public/signup'
-import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,49 +22,31 @@ const JoinRoute = JoinRouteImport.update({
   path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSignupRoute = ApiPublicSignupRouteImport.update({
-  id: '/api/public/signup',
-  path: '/api/public/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicStatsRoute = ApiPublicStatsRouteImport.update({
-  id: '/api/public/stats',
-  path: '/api/public/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
-  '/api/public/signup': typeof ApiPublicSignupRoute
-  '/api/public/stats': typeof ApiPublicStatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
-  '/api/public/signup': typeof ApiPublicSignupRoute
-  '/api/public/stats': typeof ApiPublicStatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
-  '/api/public/signup': typeof ApiPublicSignupRoute
-  '/api/public/stats': typeof ApiPublicStatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/join' | '/api/public/signup' | '/api/public/stats'
+  fullPaths: '/' | '/join'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/join' | '/api/public/signup' | '/api/public/stats'
-  id: '__root__' | '/' | '/join' | '/api/public/signup' | '/api/public/stats'
+  to: '/' | '/join'
+  id: '__root__' | '/' | '/join'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JoinRoute: typeof JoinRoute
-  ApiPublicSignupRoute: typeof ApiPublicSignupRoute
-  ApiPublicStatsRoute: typeof ApiPublicStatsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,28 +65,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/signup': {
-      id: '/api/public/signup'
-      path: '/api/public/signup'
-      fullPath: '/api/public/signup'
-      preLoaderRoute: typeof ApiPublicSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/stats': {
-      id: '/api/public/stats'
-      path: '/api/public/stats'
-      fullPath: '/api/public/stats'
-      preLoaderRoute: typeof ApiPublicStatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JoinRoute: JoinRoute,
-  ApiPublicSignupRoute: ApiPublicSignupRoute,
-  ApiPublicStatsRoute: ApiPublicStatsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
