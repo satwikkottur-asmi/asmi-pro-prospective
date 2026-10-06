@@ -1,35 +1,46 @@
-# Welcome to your Lovable project
+# Asmi for Pros
 
-This project was built with [Lovable](https://lovable.dev).
+Bilingual (en/es) waitlist landing page for home-service pros.
 
-## Build with Lovable
+**Stack:** TanStack Start (React 19, SSR) on Vite · Cloudflare Workers via Nitro · axios · Biome
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Frontend only: the waitlist API is an external backend (contract in [docs/api.md](docs/api.md)).
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Setup
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
+cp .env.example .env   # set VITE_API_BASE_URL
+pre-commit install     # Biome formatting on commit
 npm run dev
 ```
 
-## Built with
+## Scripts
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server with HMR |
+| `npm run build` | Production build → `.output/` (Cloudflare Worker) |
+| `npm run preview` | Serve the production build |
+| `npm run check` | Typecheck + lint + format check + tests |
+| `npm run format` | Biome format + organize imports |
+| `npm test` | Vitest (single file: `npx vitest run src/test/<file>`) |
 
-## Asmi for Pros notes
-- Spanish copy needs native speaker review before launch.
-- Launch switches live in src/config.ts.
-- Privacy and Terms are drafts until the old repo text is pasted in.
-- Founder photos go in public/team/rishi.jpg and public/team/satwik.jpg.
+## Project layout
+
+```
+src/
+  routes/            file-based routes (/, /join)
+  components/asmi/   landing sections, signup flow, shared primitives
+  lib/               app context, copy (dict.ts), API client (api.ts), stats, SEO
+  config.ts          launch switches and domain keys
+  styles.css         the single stylesheet (tokens → base → components → sections)
+docs/api.md          backend contract the frontend expects
+```
+
+## Launch notes
+
+- Spanish copy needs native-speaker review before launch.
+- Launch switches live in `src/config.ts`.
+- Signup API origin is `VITE_API_BASE_URL` (empty → same origin); paths live in `src/lib/api.ts`.
+- Phone numbers are format-checked only; no SMS verification yet.

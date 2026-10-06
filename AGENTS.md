@@ -1,16 +1,7 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
-- Waitlist writes and stats go through server routes under src/routes/api/public (logic in src/lib/waitlist.server.ts) using the service role; tables have RLS with no public policies, so the browser never touches the database directly.
+- This repo is frontend-only. Waitlist signup, analytics events and stats go to an external backend through src/lib/api.ts (axios); the contract is docs/api.md. Keep the two in sync.
 - All page copy lives in src/lib/dict.ts (en/es) so both languages stay in sync.
-- Waitlist rows are drafts after step one; only rows with confirmed_at set after step two count publicly or earn referral credit.
-- Global queue positions and remaining launch allocation use shared count helpers plus confirmed rows, so verified pre-existing signups are counted once without fabricated database records.
+- Phone numbers are format-validated only (libphonenumber-js); there is no OTP/SMS verification yet.
 - Company proof uses one coordinated accessible ticker with a static reduced-motion fallback so labels and company names stay aligned.
 - The day conversation renders inside a fixed-aspect phone with an independently scrolling message list so playback never stretches the page.
+- All styling lives in src/styles.css as semantic classes; components carry class names only (no inline styles, no utility classes). CSS custom properties passed via style (e.g. --i) are the one exception.
+- Prefer native platform features for motion and UI: CSS transitions/keyframes, @starting-style, <dialog>, IntersectionObserver. Every animation must respect prefers-reduced-motion.
