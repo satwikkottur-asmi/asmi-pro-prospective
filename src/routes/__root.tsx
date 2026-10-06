@@ -1,52 +1,68 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  Outlet,
-  Link,
   createRootRouteWithContext,
+  type ErrorComponentProps,
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
   useRouter,
   useRouterState,
-  HeadContent,
-  Scripts,
-  type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-
-import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { type ReactNode, useEffect } from "react";
 import { AppProvider } from "@/lib/app-context";
+import appCss from "../styles.css?url";
 
-function NotFoundComponent() {
+// Centered full-screen message used by the 404 and error boundaries.
+function StatusPage({
+  title,
+  body,
+  children,
+}: {
+  title: string;
+  body: string;
+  children: ReactNode;
+}) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="max-w-md text-center">
-        <h1>404</h1>
-        <p className="mt-4">This page does not exist.</p>
-        <div className="mt-6">
-          <Link to="/" className="btn">Go home</Link>
-        </div>
+    <div className="status-page">
+      <div>
+        <h1>{title}</h1>
+        <p>{body}</p>
+        <div className="status-actions">{children}</div>
       </div>
     </div>
   );
 }
 
-function ErrorComponent({ error, reset }: ErrorComponentProps) {
-  console.error(error);
-  const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
-
+function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="max-w-md text-center">
-        <h2>This page did not load</h2>
-        <p className="mt-2">Try refreshing, or head back home.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button onClick={() => { router.invalidate(); reset(); }} className="btn-2 lime">Try again</button>
-          <a href="/" className="btn-2">Go home</a>
-        </div>
-      </div>
-    </div>
+    <StatusPage title="404" body="This page does not exist.">
+      <Link to="/" className="btn-2 lime">
+        Go home
+      </Link>
+    </StatusPage>
+  );
+}
+
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
+  const router = useRouter();
+  useEffect(() => console.error(error), [error]);
+  return (
+    <StatusPage title="This page did not load" body="Try refreshing, or head back home.">
+      <button
+        type="button"
+        className="btn-2 lime"
+        onClick={() => {
+          router.invalidate();
+          reset();
+        }}
+      >
+        Try again
+      </button>
+      <a href="/" className="btn-2">
+        Go home
+      </a>
+    </StatusPage>
   );
 }
 
@@ -91,8 +107,13 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const search = useRouterState({ select: (s) => s.location.search }) as Record<string, string | undefined>;
-  const norm = Object.fromEntries(Object.entries(search).map(([k, v]) => [k, v == null ? undefined : String(v)]));
+  const search = useRouterState({ select: (s) => s.location.search }) as Record<
+    string,
+    string | undefined
+  >;
+  const norm = Object.fromEntries(
+    Object.entries(search).map(([k, v]) => [k, v == null ? undefined : String(v)]),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

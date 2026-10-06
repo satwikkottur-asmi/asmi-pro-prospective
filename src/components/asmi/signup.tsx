@@ -1,26 +1,158 @@
-import * as Dialog from "@radix-ui/react-dialog";
 import { AsYouType, isValidPhoneNumber } from "libphonenumber-js";
-import { useState } from "react";
-import callBase from "@/assets/scene-call-base.webp.asset.json";
-import callLime from "@/assets/scene-call-lime.webp.asset.json";
+import {
+  type FormEvent,
+  type InputHTMLAttributes,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import callBase from "@/assets/scene-call-base.webp";
+import callLime from "@/assets/scene-call-lime.webp";
+import {
+  CITY_KEYS,
+  type CityKey,
+  CREW_KEYS,
+  type CrewKey,
+  NEXT_STEPS_TIMING,
+  REFERRAL_BUMP,
+  SITE_URL,
+  TRADE_KEYS,
+  type TradeKey,
+} from "@/config";
+import { postSignup } from "@/lib/api";
 import { getAttribution, track, useApp } from "@/lib/app-context";
-import { CREW_KEYS, TRADE_KEYS } from "@/lib/dict";
-import { NEXT_STEPS_TIMING, REFERRAL_BUMP, SITE_URL, type CityKey } from "@/config";
-import { Plate } from "./chrome";
+import { EMAIL_RE, ZIP_RE } from "@/lib/validation";
+import { Plate } from "./primitives";
 
-const CITY_KEYS: CityKey[] = ["bay_area", "los_angeles", "new_york", "other"];
+type Field = "city" | "serviceCity" | "name" | "phone" | "consent" | "net" | "zip" | "email";
+type Errs = Partial<Record<Field, string>>;
+type Saved = {
+  token: string | null;
+  ref_code: string | null;
+  position: number | null;
+  city: CityKey;
+};
 
-type Errs = Partial<Record<"city" | "serviceCity" | "name" | "phone" | "consent" | "net" | "zip" | "email", string>>;
-type Saved = { token: string | null; ref_code: string | null; position: number | null; city: CityKey };
+const TITLE_ID = "signup-title";
 
-async function post(body: unknown) {
-  const r = await fetch("/api/public/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const j = await r.json().catch(() => ({}));
-  return { ok: r.ok && j.ok, data: j };
+// Label + input + live error line. Ids: input `f-<name>`, error `e-<name>`.
+function TextField({
+  name,
+  label,
+  error,
+  ...input
+}: { name: string; label: string; error?: string } & InputHTMLAttributes<HTMLInputElement>) {
+  const hasError = error !== undefined;
+  return (
+    <>
+      <label className="flabel" htmlFor={`f-${name}`}>
+        {label}
+      </label>
+      <input
+        id={`f-${name}`}
+        className="field"
+        aria-invalid={hasError ? !!error : undefined}
+        aria-describedby={hasError ? `e-${name}` : undefined}
+        {...input}
+      />
+      {hasError && <ErrorLine id={`e-${name}`}>{error}</ErrorLine>}
+    </>
+  );
+}
+
+function ErrorLine({
+  id,
+  center,
+  children,
+}: {
+  id?: string;
+  center?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <p className={center ? "err center" : "err"} id={id} aria-live="polite">
+      {children}
+    </p>
+  );
+}
+
+// Chip group: single choice (radio semantics) or multi choice (toggle buttons).
+function Choices<K extends string>({
+  legend,
+  options,
+  labels,
+  isOn,
+  onPick,
+  multi,
+  id,
+  error,
+}: {
+  legend: string;
+  options: readonly K[];
+  labels: Record<K, string>;
+  isOn: (k: K) => boolean;
+  onPick: (k: K) => void;
+  multi?: boolean;
+  id?: string;
+  error?: string;
+}) {
+  return (
+    <fieldset>
+      <legend className="flabel">{legend}</legend>
+      <div
+        className="chips"
+        role={multi ? undefined : "radiogroup"}
+        aria-label={multi ? undefined : legend}
+        id={id}
+        tabIndex={id ? -1 : undefined}
+      >
+        {options.map((k) => (
+          <button
+            key={k}
+            type="button"
+            role={multi ? undefined : "radio"}
+            aria-checked={multi ? undefined : isOn(k)}
+            aria-pressed={multi ? isOn(k) : undefined}
+            onClick={() => onPick(k)}
+          >
+            {labels[k]}
+          </button>
+        ))}
+      </div>
+      {error !== undefined && <ErrorLine>{error}</ErrorLine>}
+    </fieldset>
+  );
+}
+
+function Submit({
+  busy,
+  label,
+  savingLabel,
+  error,
+}: {
+  busy: boolean;
+  label: string;
+  savingLabel: string;
+  error?: string | undefined;
+}) {
+  return (
+    <>
+      <button type="submit" className="btn submit" disabled={busy}>
+        {busy ? savingLabel : label}
+      </button>
+      <ErrorLine center>{error}</ErrorLine>
+    </>
+  );
+}
+
+function ActionCard({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="card2">
+      <p className="card2-title">{title}</p>
+      {children}
+    </div>
+  );
 }
 
 export function SignupFlow({ onClose }: { onClose?: () => void }) {
@@ -37,9 +169,9 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<Saved | null>(null);
   // step 2
-  const [trades, setTrades] = useState<string[]>([]);
+  const [trades, setTrades] = useState<TradeKey[]>([]);
   const [tradeOther, setTradeOther] = useState("");
-  const [crew, setCrew] = useState<string | null>(null);
+  const [crew, setCrew] = useState<CrewKey | null>(null);
   const [zip, setZip] = useState("");
   const [biz, setBiz] = useState("");
   const [email, setEmail] = useState("");
@@ -47,7 +179,9 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
   const [called, setCalled] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  async function submit1(e: React.FormEvent) {
+  const clearErr = (f: Field) => setErrs((e) => ({ ...e, [f]: "" }));
+
+  async function submit1(e: FormEvent) {
     e.preventDefault();
     const er: Errs = {};
     if (!city) er.city = s.errCity;
@@ -57,27 +191,36 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     if (!consent) er.consent = s.errConsent;
     setErrs(er);
     track("step1_submit");
-    if (Object.keys(er).length) {
-      Object.keys(er).forEach((f) => track("step1_error", { field: f }));
-      const first = Object.keys(er)[0];
-      document.getElementById(first === "serviceCity" ? "f-service-city" : `f-${first}`)?.focus();
+    const fields = Object.keys(er);
+    if (fields.length) {
+      for (const field of fields) track("step1_error", { field });
+      document.getElementById(`f-${fields[0]}`)?.focus();
       return;
     }
     setBusy(true);
     try {
-      const { ok, data } = await post({
-        stage: 1, city, service_city: serviceCity, name, phone, consent, lang, variant, hp,
-        consent_text: t.consentText, attribution: getAttribution(),
+      const { ok, data } = await postSignup<{ token: string; ref_code: string }>({
+        stage: 1,
+        city,
+        service_city: serviceCity,
+        name,
+        phone,
+        consent,
+        lang,
+        variant,
+        hp,
+        consent_text: t.consentText,
+        attribution: getAttribution(),
       });
       if (!ok) {
-        if (data?.error === "phone") setErrs({ phone: s.errPhone });
-        else setErrs({ net: s.errNet });
-        track("step1_error", { field: data?.error || "network" });
+        setErrs(data.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
+        track("step1_error", { field: data.error || "network" });
         return;
       }
-      setCity(city!);
-      setSaved({ token: data.token, ref_code: data.ref_code, position: null, city: city! });
-      track("step1_success", { city });
+      const picked = city as CityKey;
+      setCity(picked);
+      setSaved({ token: data.token, ref_code: data.ref_code, position: null, city: picked });
+      track("step1_success", { city: picked });
       setStep(2);
     } catch {
       setErrs({ net: s.errNet });
@@ -87,20 +230,32 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     }
   }
 
-  async function submit2(e: React.FormEvent) {
+  async function submit2(e: FormEvent) {
     e.preventDefault();
     const er: Errs = {};
-    if (zip && !/^\d{5}$/.test(zip)) er.zip = s.errZip;
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) er.email = s.errEmail;
+    if (zip && !ZIP_RE.test(zip)) er.zip = s.errZip;
+    if (email && !EMAIL_RE.test(email)) er.email = s.errEmail;
     setErrs(er);
     if (Object.keys(er).length) return;
     setBusy(true);
     track("step2_submit", { trades: trades.length, crew });
     try {
       if (saved?.token) {
-        const { ok, data } = await post({ stage: 2, token: saved.token, trades, trade_other: tradeOther, crew_size: crew, zip, business_name: biz, email });
-        if (!ok) { setErrs({ net: s.errNet }); return; }
-        setSaved((current) => current ? { ...current, position: data.position ?? null } : current);
+        const { ok, data } = await postSignup<{ position?: number }>({
+          stage: 2,
+          token: saved.token,
+          trades,
+          trade_other: tradeOther,
+          crew_size: crew,
+          zip,
+          business_name: biz,
+          email,
+        });
+        if (!ok) {
+          setErrs({ net: s.errNet });
+          return;
+        }
+        setSaved((cur) => (cur ? { ...cur, position: data.position ?? null } : cur));
       }
       setStep(3);
     } catch {
@@ -110,202 +265,295 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     }
   }
 
-  const shareUrl = (() => {
-    const base = SITE_URL || (typeof window !== "undefined" ? window.location.origin : "");
-    return saved?.ref_code ? `${base}/?ref=${saved.ref_code}` : base + "/";
-  })();
-  const shareMsg = `${s.shareText} ${shareUrl}`;
+  const base = SITE_URL || (typeof window !== "undefined" ? window.location.origin : "");
+  const shareUrl = saved?.ref_code ? `${base}/?ref=${saved.ref_code}` : `${base}/`;
 
-  async function share() {
-    track("share_click", { method: "share" });
-    if (navigator.share) {
-      try { await navigator.share({ text: s.shareText, url: shareUrl }); } catch { /* cancelled */ }
-    } else copy();
-  }
   async function copy() {
     track("share_click", { method: "copy" });
-    try { await navigator.clipboard.writeText(shareMsg); setCopied(true); } catch { /* ignore */ }
+    try {
+      await navigator.clipboard.writeText(`${s.shareText} ${shareUrl}`);
+      setCopied(true);
+    } catch {
+      /* clipboard blocked */
+    }
+  }
+  async function share() {
+    track("share_click", { method: "share" });
+    if (!navigator.share) return copy();
+    try {
+      await navigator.share({ text: s.shareText, url: shareUrl });
+    } catch {
+      /* cancelled */
+    }
   }
   async function callMe() {
     track("demo_request");
-    if (saved?.token) await post({ stage: 3, token: saved.token, demo_call_requested: true }).catch(() => {});
+    if (saved?.token)
+      await postSignup({ stage: 3, token: saved.token, demo_call_requested: true }).catch(() => {});
     setCalled(true);
   }
 
-  const Title = onClose ? Dialog.Title : "h1";
+  // Heading level: dialog title in the sheet, page h1 on /join.
+  const Title = onClose ? "h2" : "h1";
 
   return (
     <div>
-      <div className="flex items-center justify-between mono" style={{ fontWeight: 700, fontSize: 14, color: "var(--ink)", letterSpacing: ".06em" }}>
+      <div className="flow-head mono">
         <span>{s.workOrder}</span>
         {onClose && (
-          <Dialog.Close className="xbtn" aria-label={s.close} />
+          // The flow mounts after showModal(), so focus the close button like the dialog would.
+          // biome-ignore lint/a11y/noAutofocus: initial focus inside a modal dialog
+          <button type="button" className="xbtn" aria-label={s.close} onClick={onClose} autoFocus />
         )}
       </div>
       <div className="prog" aria-hidden>
-        {[1, 2, 3].map((i) => <i key={i} className={i <= step ? "f" : ""} />)}
+        {[1, 2, 3].map((i) => (
+          <i key={i} className={i <= step ? "f" : undefined} />
+        ))}
       </div>
 
       {step === 1 && (
         <form onSubmit={submit1} noValidate>
-          <Title style={{ fontSize: 30, lineHeight: 1.1, fontWeight: 700, color: "var(--ink)" }}>{s.h}</Title>
-          <p style={{ fontSize: 16, marginTop: 6 }}>{s.hSub}</p>
+          <Title id={TITLE_ID} className="flow-title">
+            {s.h}
+          </Title>
+          <p className="flow-sub">{s.hSub}</p>
 
-          <fieldset>
-            <legend className="flabel">{s.where}</legend>
-            <div className="chips" role="radiogroup" aria-label={s.where} id="f-city" tabIndex={-1}>
-              {CITY_KEYS.map((c) => (
-                <button key={c} type="button" role="radio" aria-checked={city === c} onClick={() => { setCityLocal(c); setErrs((e) => ({ ...e, city: "" })); }}>
-                  {t.cities[c]}
-                </button>
-              ))}
-            </div>
-            <p className="err" aria-live="polite">{errs.city}</p>
-          </fieldset>
+          <Choices
+            legend={s.where}
+            options={CITY_KEYS}
+            labels={t.cities}
+            isOn={(c) => city === c}
+            onPick={(c) => {
+              setCityLocal(c);
+              clearErr("city");
+            }}
+            id="f-city"
+            error={errs.city ?? ""}
+          />
 
           {city === "other" && (
-            <>
-              <label className="flabel" htmlFor="f-service-city">{s.otherCity}</label>
-              <input id="f-service-city" className="field" autoComplete="address-level2" placeholder={s.otherCityPh} value={serviceCity} maxLength={100}
-                onChange={(e) => { setServiceCity(e.target.value); setErrs((current) => ({ ...current, serviceCity: "" })); }}
-                aria-invalid={!!errs.serviceCity} aria-describedby="e-service-city" />
-              <p className="err" id="e-service-city" aria-live="polite">{errs.serviceCity}</p>
-            </>
+            <TextField
+              name="serviceCity"
+              label={s.otherCity}
+              error={errs.serviceCity ?? ""}
+              autoComplete="address-level2"
+              placeholder={s.otherCityPh}
+              value={serviceCity}
+              maxLength={100}
+              onChange={(e) => {
+                setServiceCity(e.target.value);
+                clearErr("serviceCity");
+              }}
+            />
           )}
 
-          <label className="flabel" htmlFor="f-name">{s.name}</label>
-          <input id="f-name" className="field" autoComplete="name" placeholder={s.namePh} value={name} maxLength={80}
-            onChange={(e) => setName(e.target.value)} aria-invalid={!!errs.name} aria-describedby="e-name" />
-          <p className="err" id="e-name" aria-live="polite">{errs.name}</p>
+          <TextField
+            name="name"
+            label={s.name}
+            error={errs.name ?? ""}
+            autoComplete="name"
+            placeholder={s.namePh}
+            value={name}
+            maxLength={80}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-          <label className="flabel" htmlFor="f-phone">{s.phone}</label>
-          <input id="f-phone" className="field" type="tel" inputMode="tel" autoComplete="tel" placeholder="(415) 555-0123" value={phone}
+          <TextField
+            name="phone"
+            label={s.phone}
+            error={errs.phone ?? ""}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="(415) 555-0123"
+            value={phone}
             onChange={(e) => {
               const v = e.target.value;
+              // Format while typing, but let deletions through untouched.
               setPhone(v.length < phone.length ? v : new AsYouType("US").input(v));
             }}
-            aria-invalid={!!errs.phone} aria-describedby="e-phone" />
-          <p className="err" id="e-phone" aria-live="polite">{errs.phone}</p>
+          />
 
           <div className="hp" aria-hidden>
             <label htmlFor="company_website">Company website</label>
-            <input id="company_website" name="company_website" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+            <input
+              id="company_website"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={hp}
+              onChange={(e) => setHp(e.target.value)}
+            />
           </div>
 
           <label className="consent" htmlFor="f-consent">
-            <input id="f-consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-describedby="e-consent" />
-            <span><b>{s.consentBold}</b></span>
+            <input
+              id="f-consent"
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              aria-describedby="e-consent"
+            />
+            <b>{s.consentBold}</b>
           </label>
-          <p className="err" id="e-consent" aria-live="polite">{errs.consent}</p>
+          <ErrorLine id="e-consent">{errs.consent}</ErrorLine>
 
-          <button type="submit" className="btn mt-4" disabled={busy}>{busy ? s.saving : s.h}</button>
-          <p className="err text-center" aria-live="polite">{errs.net}</p>
-          {s.under && <p className="text-center" style={{ fontSize: 15, color: "var(--muted)", marginTop: 10 }}>{s.under}</p>}
+          <Submit busy={busy} label={s.h} savingLabel={s.saving} error={errs.net} />
         </form>
       )}
 
       {step === 2 && (
         <form onSubmit={submit2} noValidate>
-          <Title style={{ fontSize: 30, lineHeight: 1.1, fontWeight: 700, color: "var(--ink)" }}>{s.s2h}</Title>
-          <p style={{ fontSize: 16, marginTop: 6 }}>{s.s2sub}</p>
+          <Title id={TITLE_ID} className="flow-title">
+            {s.s2h}
+          </Title>
+          <p className="flow-sub">{s.s2sub}</p>
 
-          <fieldset>
-            <legend className="flabel">{s.trades}</legend>
-            <div className="chips">
-              {TRADE_KEYS.map((k, i) => (
-                <button key={k} type="button" aria-pressed={trades.includes(k)}
-                  onClick={() => setTrades((tr) => (tr.includes(k) ? tr.filter((x) => x !== k) : [...tr, k]))}>
-                  {s.tradeList[i]}
-                </button>
-              ))}
-            </div>
-          </fieldset>
+          <Choices
+            multi
+            legend={s.trades}
+            options={TRADE_KEYS}
+            labels={s.tradeLabels}
+            isOn={(k) => trades.includes(k)}
+            onPick={(k) =>
+              setTrades((tr) => (tr.includes(k) ? tr.filter((x) => x !== k) : [...tr, k]))
+            }
+          />
           {trades.includes("other") && (
-            <>
-              <label className="flabel" htmlFor="f-other">{s.whichTrade}</label>
-              <input id="f-other" className="field" value={tradeOther} maxLength={60} onChange={(e) => setTradeOther(e.target.value)} />
-            </>
+            <TextField
+              name="other"
+              label={s.whichTrade}
+              value={tradeOther}
+              maxLength={60}
+              onChange={(e) => setTradeOther(e.target.value)}
+            />
           )}
 
-          <fieldset>
-            <legend className="flabel">{s.crew}</legend>
-            <div className="chips" role="radiogroup" aria-label={s.crew}>
-              {CREW_KEYS.map((k, i) => (
-                <button key={k} type="button" role="radio" aria-checked={crew === k} onClick={() => setCrew(k)}>{s.crewList[i]}</button>
-              ))}
-            </div>
-          </fieldset>
+          <Choices
+            legend={s.crew}
+            options={CREW_KEYS}
+            labels={s.crewLabels}
+            isOn={(k) => crew === k}
+            onPick={setCrew}
+          />
 
-          <label className="flabel" htmlFor="f-zip">{s.zip}</label>
-          <input id="f-zip" className="field" inputMode="numeric" autoComplete="postal-code" maxLength={5} value={zip}
-            onChange={(e) => setZip(e.target.value.replace(/\D/g, "").slice(0, 5))} aria-describedby="e-zip" />
-          <p className="err" id="e-zip" aria-live="polite">{errs.zip}</p>
+          <TextField
+            name="zip"
+            label={s.zip}
+            error={errs.zip ?? ""}
+            inputMode="numeric"
+            autoComplete="postal-code"
+            maxLength={5}
+            value={zip}
+            onChange={(e) => setZip(e.target.value.replace(/\D/g, "").slice(0, 5))}
+          />
+          <TextField
+            name="biz"
+            label={s.biz}
+            autoComplete="organization"
+            maxLength={120}
+            value={biz}
+            onChange={(e) => setBiz(e.target.value)}
+          />
+          <TextField
+            name="email"
+            label={s.email}
+            error={errs.email ?? ""}
+            type="email"
+            autoComplete="email"
+            maxLength={200}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <label className="flabel" htmlFor="f-biz">{s.biz}</label>
-          <input id="f-biz" className="field" autoComplete="organization" maxLength={120} value={biz} onChange={(e) => setBiz(e.target.value)} />
-
-          <label className="flabel" htmlFor="f-email">{s.email}</label>
-          <input id="f-email" className="field" type="email" autoComplete="email" maxLength={200} value={email} onChange={(e) => setEmail(e.target.value)} aria-describedby="e-email" />
-          <p className="err" id="e-email" aria-live="polite">{errs.email}</p>
-
-          <button type="submit" className="btn mt-4" disabled={busy}>{busy ? s.saving : s.save}</button>
-          <p className="err text-center" aria-live="polite">{errs.net}</p>
+          <Submit busy={busy} label={s.save} savingLabel={s.saving} error={errs.net} />
         </form>
       )}
 
       {step === 3 && saved && (
         <div>
-          <Title className="sr-only">{s.s2h}</Title>
-          <div style={{ position: "relative", width: "70%", margin: "0 auto" }}>
-            <Plate base={callBase.url} lime={callLime.url} alt="" w={720} h={518} eager />
-            <span className="stamp" style={{ position: "absolute", right: -8, top: 8, transform: "rotate(-5deg)" }}>{s.onList}</span>
+          <Title id={TITLE_ID} className="sr-only">
+            {s.s2h}
+          </Title>
+          <div className="done-art">
+            <Plate base={callBase} lime={callLime} alt="" w={720} h={518} eager />
+            <span className="stamp">{s.onList}</span>
           </div>
-          <div className="text-center" style={{ marginTop: 10 }}>
-            {saved.position != null && <b className="tnum" style={{ display: "block", fontSize: 40, color: "var(--ink)", lineHeight: 1 }}>#{saved.position}</b>}
-            <span style={{ fontSize: 17, fontWeight: 600, color: "var(--ink)" }}>
-              {saved.city === "other" ? s.onTheList : s.inCity(t.cities[saved.city])}
-            </span>
+          <div className="done-status">
+            {saved.position != null && <b className="tnum">#{saved.position}</b>}
+            <span>{saved.city === "other" ? s.onTheList : s.inCity(t.cities[saved.city])}</span>
           </div>
-          <div className="dashrows">
-            <p><b style={{ color: "var(--ink)" }}>1.</b> {s.step1}</p>
-            <p><b style={{ color: "var(--ink)" }}>2.</b> {s.step2(t.citiesShort[saved.city])}{NEXT_STEPS_TIMING ? ` ${NEXT_STEPS_TIMING}` : ""}</p>
-            <p><b style={{ color: "var(--ink)" }}>3.</b> {s.step3}</p>
-          </div>
-          <div className="card2">
-            <p style={{ fontWeight: 700, color: "var(--ink)", fontSize: 17 }}>{s.knowPro}</p>
-            {REFERRAL_BUMP > 0 && <p style={{ fontSize: 15, marginTop: 4 }}>{s.bump(REFERRAL_BUMP)}</p>}
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              <button type="button" className="btn-2 lime" onClick={share}>{s.share}</button>
-              <button type="button" className="btn-2" onClick={copy} aria-live="polite">{copied ? s.copied : s.copy}</button>
+          <ol className="dashrows">
+            {[
+              s.step1,
+              `${s.step2(t.citiesShort[saved.city])}${NEXT_STEPS_TIMING ? ` ${NEXT_STEPS_TIMING}` : ""}`,
+              s.step3,
+            ].map((text, i) => (
+              <li key={text}>
+                <b>{i + 1}.</b> {text}
+              </li>
+            ))}
+          </ol>
+          <ActionCard title={s.knowPro}>
+            {REFERRAL_BUMP > 0 && <p className="card2-note">{s.bump(REFERRAL_BUMP)}</p>}
+            <div className="card2-actions">
+              <button type="button" className="btn-2 lime" onClick={share}>
+                {s.share}
+              </button>
+              <button type="button" className="btn-2" onClick={copy} aria-live="polite">
+                {copied ? s.copied : s.copy}
+              </button>
             </div>
-          </div>
-          <div className="card2">
-            <p style={{ fontWeight: 700, color: "var(--ink)", fontSize: 17 }}>{s.call}</p>
+          </ActionCard>
+          <ActionCard title={s.call}>
             {called ? (
-              <p className="mt-2" role="status" style={{ fontWeight: 600 }}>{s.callDone}</p>
+              <p className="card2-done" role="status">
+                {s.callDone}
+              </p>
             ) : (
-              <button type="button" className="btn-2 w-full mt-3" onClick={callMe}>{s.callBtn}</button>
+              <button type="button" className="btn-2 card2-btn" onClick={callMe}>
+                {s.callBtn}
+              </button>
             )}
-          </div>
+          </ActionCard>
         </div>
       )}
     </div>
   );
 }
 
+// Native modal <dialog>: focus trap, Esc, inert page and focus return come from the browser.
+// Each open remounts the flow so it starts fresh at step 1.
 export function SignupSheet() {
   const { sheetOpen, closeSheet } = useApp();
+  const ref = useRef<HTMLDialogElement>(null);
+  const [session, setSession] = useState(0);
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (sheetOpen && !dialog.open) {
+      setSession((n) => n + 1);
+      dialog.showModal();
+    } else if (!sheetOpen && dialog.open) {
+      dialog.close();
+    }
+  }, [sheetOpen]);
+
   return (
-    <Dialog.Root open={sheetOpen} onOpenChange={(o) => !o && closeSheet()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="backdrop" />
-        <Dialog.Content className="sheet" aria-describedby={undefined}>
-          <div className="sheet-scroll">
-            <div className="handle" aria-hidden />
-            <SignupFlow onClose={closeSheet} />
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <dialog
+      ref={ref}
+      className="sheet"
+      aria-labelledby={TITLE_ID}
+      onClose={closeSheet}
+      // Clicks on the ::backdrop target the dialog itself; content clicks hit .sheet-scroll.
+      onClick={(e) => e.target === e.currentTarget && closeSheet()}
+    >
+      <div className="sheet-scroll">
+        <div className="handle" aria-hidden />
+        {session > 0 && <SignupFlow key={session} onClose={closeSheet} />}
+      </div>
+    </dialog>
   );
 }
