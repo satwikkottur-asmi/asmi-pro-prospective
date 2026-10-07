@@ -1,8 +1,10 @@
-import { type ReactNode, useEffect } from "react";
+import { lazy, type ReactNode, Suspense, useEffect } from "react";
 import { Link, Outlet, ScrollRestoration, useRouteError, useSearchParams } from "react-router";
 import { AppProvider } from "@/lib/app-context";
 import { PageShell } from "./chrome";
-import { SignupFlow } from "./signup";
+
+// Same signup chunk as the landing sheet (see landing.tsx).
+const SignupFlow = lazy(() => import("./signup").then((m) => ({ default: m.SignupFlow })));
 
 // App shell: URL params (v, src, lang, city) feed the app context for every page.
 export function RootLayout() {
@@ -19,7 +21,9 @@ export function JoinPage() {
   return (
     <PageShell className="wrap join-main">
       <div className="obj join-card">
-        <SignupFlow />
+        <Suspense fallback={null}>
+          <SignupFlow />
+        </Suspense>
       </div>
     </PageShell>
   );

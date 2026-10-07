@@ -1,4 +1,12 @@
-import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  lazy,
+  type ReactNode,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import rishPhoto from "@/assets/rish-founder.jpg";
 import satwikPhoto from "@/assets/satwik-founder.jpg";
 import heroBase from "@/assets/scene-hero3-base.webp";
@@ -24,7 +32,10 @@ import { Footer, TopBar } from "./chrome";
 import { CompanyProof } from "./company-proof";
 import { DayThread } from "./day-thread";
 import { BrandText, CheckList, JoinCta, LiveLine, Plate, Section } from "./primitives";
-import { SignupSheet } from "./signup";
+
+// Signup code (form + libphonenumber-js) in its own chunk → smaller first bundle, faster first paint.
+// Fetched right after the landing mounts, so it's ready by the first CTA tap.
+const SignupSheet = lazy(() => import("./signup").then((m) => ({ default: m.SignupSheet })));
 
 // Promotional counters (PROMO_COUNTER in config.ts; frozen under reduced motion):
 // - Start from backend stats: "spots left" = `remaining`, city cards = `cities`; hidden until they load
@@ -509,7 +520,9 @@ export function Landing() {
         <Final stats={stats} spots={spots} />
       </main>
       <Footer />
-      <SignupSheet />
+      <Suspense fallback={null}>
+        <SignupSheet />
+      </Suspense>
     </>
   );
 }
