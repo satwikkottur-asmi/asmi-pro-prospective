@@ -4,7 +4,7 @@ Bilingual (en/es) waitlist landing page for home-service pros.
 
 **Stack:** React 19 SPA on Vite · React Router · axios · Biome · deployed on Vercel
 
-Frontend only: the waitlist API is an external backend (contract in [docs/api.md](docs/api.md)).
+Frontend only: the waitlist API is an external backend (contract in [docs/backend_contracts.md](docs/backend_contracts.md), types in `src/lib/api-types.ts`).
 
 ## Setup
 
@@ -38,12 +38,12 @@ src/
   styles.css         the single stylesheet (tokens → base → components → sections)
 index.html           static meta/OG tags and fonts
 vercel.json          SPA rewrite to index.html
-docs/api.md          backend contract the frontend expects
+docs/backend_contracts.md  backend contract the frontend expects
 ```
 
 ## Launch notes
 
 - Spanish copy needs native-speaker review before launch.
 - Launch switches live in `src/config.ts`.
-- Set `VITE_API_BASE_URL` in the Vercel project env (build-time). Signup API origin is `VITE_API_BASE_URL` (empty → same origin); paths live in `src/lib/api.ts`.
+- Set `VITE_API_BASE_URL` in the Vercel project env (build-time). Signup API origin is `VITE_API_BASE_URL` (empty → same origin); paths live in `src/lib/api-types.ts`. Set `MOCK_API_CALL=true` to run without a backend.
 - Phone numbers are format-checked only; no SMS verification yet.
