@@ -22,4 +22,4 @@ export function spotsLeft(stats: Stats | undefined, city: CityKey | null): numbe
   return Math.max(0, cap - (stats.cities[city] ?? 0));
 }
 
-export const showCounts = (s?: Stats) => !!s && s.total >= MIN_COUNT_TO_SHOW;
+export const showCounts = (s?: Stats): s is Stats => !!s && s.total >= MIN_COUNT_TO_SHOW;

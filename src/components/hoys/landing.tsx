@@ -402,6 +402,7 @@ function CityCard({ city, joined }: { city: LaunchCity; joined: number | null })
 }
 
 // City counts = backend `cities` + the promo counter's extra joins (0 while it's off).
+// Hidden until `showCounts` (total ≥ MIN_COUNT_TO_SHOW) → no "0 pros joined" on launch day.
 function Spots({ stats, joined }: { stats: Stats | undefined; joined: Promo["joined"] }) {
   const { t } = useApp();
   return (
@@ -411,7 +412,7 @@ function Spots({ stats, joined }: { stats: Stats | undefined; joined: Promo["joi
           <CityCard
             key={city}
             city={city}
-            joined={stats ? (stats.cities[city] ?? 0) + joined[city] : null}
+            joined={showCounts(stats) ? (stats.cities[city] ?? 0) + joined[city] : null}
           />
         ))}
       </div>
@@ -486,7 +487,8 @@ export function Landing() {
   const promo = usePromo();
   // Backend `remaining` minus counter steps (0 while PROMO_COUNTER is off). Null → line hidden.
   // Floors at 1 so the counter alone never shows "full"; only a backend 0 does.
-  const remaining = stats?.remaining;
+  // Same `showCounts` gate as the city cards.
+  const remaining = showCounts(stats) ? stats.remaining : undefined;
   const spots =
     remaining == null ? null : Math.max(remaining - promo.ticks, Math.min(remaining, 1));
 

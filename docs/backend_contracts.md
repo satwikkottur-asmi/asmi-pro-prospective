@@ -190,13 +190,13 @@ How these numbers are computed is up to the backend; the frontend shows them as 
 
 | Field | Type | Where it shows |
 |---|---|---|
-| `total` | integer | Not displayed; only gates the per-city "spots left" line (`total ≥ 100`, `MIN_COUNT_TO_SHOW`) |
+| `total` | integer | Not displayed; gates every count below (`total ≥ 100`, `MIN_COUNT_TO_SHOW`) |
 | `remaining` | integer ≥ 0 | "Only N spots left" under both "Join the waitlist" buttons. `0` → "This group is full" |
 | `cities` | integer per city key | "N pros joined" on the Bay Area / Los Angeles / New York cards; also "N spots left in <city>" once `CITY_SPOTS` caps are set in `config.ts` (all `null` today) |
 
-- Until stats load (or if the request fails), the spots line is hidden and city cards show the name only
+- Until stats load, if the request fails, or while `total < MIN_COUNT_TO_SHOW`: the spots line is hidden and city cards show the name only
 - Send `Cache-Control: public, max-age=60, s-maxage=60`; errors → `503 { "error": "stats_unavailable" }`
-- The frontend rejects responses without a numeric `total` (e.g. an HTML fallback page)
+- The frontend rejects responses without numeric `total` and `remaining` and a `cities` object (e.g. an HTML fallback page)
 - `recent7d` / `recent` are no longer used; the backend can stop sending them (extra fields are ignored)
 - `PROMO_COUNTER` (`config.ts`, off): when on, the shown number counts down from `remaining` on the client
 

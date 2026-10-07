@@ -84,8 +84,13 @@ export async function postSignup<R extends SignupRequest>(
 
 export async function getStats() {
   const { data } = await api.get<Stats>(API_PATHS.stats, { retries: 1 });
-  // Guards against a 200 HTML fallback page being read as stats.
-  if (typeof data?.total !== "number") throw new Error("Unexpected stats response");
+  // Guards against a 200 HTML fallback page or a partial body (missing `cities` would crash render).
+  const valid =
+    typeof data?.total === "number" &&
+    typeof data.remaining === "number" &&
+    typeof data.cities === "object" &&
+    data.cities !== null;
+  if (!valid) throw new Error("Unexpected stats response");
   return data;
 }
 
