@@ -12,10 +12,11 @@ What the frontend expects from the waitlist backend.
 |---|---|---|---|
 | `POST` | `/prospective/pro/signup/` | Signup stages `1` → `2` → `3`, plus analytics (`stage: "event"`) | `signup.tsx`, `app-context.tsx` (`track`) |
 | `GET` | `/prospective/pro/stats/` | Public counters for the landing page | `stats.ts` (`useStats`) |
+| `GET` | `/healthz/` | `200` + plain-text `OK` once the backend and database are ready | `main.tsx` (dev-only startup check via `checkHealth()`) |
 
 - **Base URL:** `VITE_API_BASE_URL` (build-time). It's required in production, because the static Vercel deploy has no same-origin API
 - **Paths:** `API_PATHS` in `api-types.ts` (Django). Keep the trailing slashes: without them POSTs fail, because Django can't redirect a POST
-- **Local dev:** run the backend with `python manage.py runserver` and set `VITE_API_BASE_URL=http://localhost:8000` (scheme + port required)
+- **Local dev:** run the backend with `python manage.py runserver` and set `VITE_API_BASE_URL=http://localhost:8000` (scheme + port required). Check it's up: `curl http://localhost:8000/healthz/` → `OK` (the dev server also warns in the console if not)
 - **Format:** JSON in, JSON out (`Content-Type: application/json`)
 - **CORS:** if the API is on another origin, allow the site origin plus `Content-Type` (every POST is preflighted). Analytics use `fetch` with `keepalive`
 - **Body limit:** ≤10 KB → else `413 too_large`; invalid JSON → `400 bad_json`

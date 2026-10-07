@@ -89,6 +89,22 @@ export async function getStats() {
   return data;
 }
 
+// Backend + database ready? GET /healthz/ → 200 "OK". Never throws; meant to run in the background.
+// - 3 attempts total (shared interceptor: exponential backoff on network errors, timeouts, 5xx)
+// - 30s per attempt: a cold backend can take 10–15s on the first hit
+export async function checkHealth(): Promise<boolean> {
+  try {
+    const { data } = await api.get<string>(API_PATHS.health, {
+      retries: 2,
+      timeout: 30_000,
+      responseType: "text",
+    });
+    return String(data).trim() === "OK";
+  } catch {
+    return false;
+  }
+}
+
 // Fire-and-forget analytics: no retries (avoid double counts), keepalive survives page unload.
 export function postEvent(body: EventRequest) {
   return postSignup(body, { retries: 0, adapter: "fetch", fetchOptions: { keepalive: true } });

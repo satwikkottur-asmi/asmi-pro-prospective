@@ -9,6 +9,7 @@ import type { Lang, Variant } from "./dict";
 export const API_PATHS = {
   signup: "/prospective/pro/signup/",
   stats: "/prospective/pro/stats/",
+  health: "/healthz/", // 200 "OK" once the backend and database are ready
 } as const;
 
 // ── Shared ──────────────────────────────────────────────────────────────────
