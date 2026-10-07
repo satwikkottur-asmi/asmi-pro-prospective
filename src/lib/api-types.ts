@@ -80,7 +80,11 @@ export type Stage2Request = {
   business_name: string;
   email: string; // "" or a valid email
 };
-export type Stage2Response = { ok: true; position: number };
+export type Stage2Response = {
+  ok: true;
+  position: number; // place on the overall waitlist (all cities)
+  city_position?: number | null; // place among this row's city; optional until the backend sends it
+};
 
 // ── POST signup, stage 3: demo call request ────────────────────────────────
 

@@ -30,7 +30,8 @@ type Errs = Partial<Record<Field, string>>;
 type Saved = {
   token: string | null;
   ref_code: string | null;
-  position: number | null;
+  position: number | null; // overall waitlist place
+  cityPosition: number | null; // place within `city`, when the backend sends it
   city: CityKey;
 };
 
@@ -222,6 +223,7 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
         token: res.data.token,
         ref_code: res.data.ref_code,
         position: null,
+        cityPosition: null,
         city: picked,
       });
       track("step1_success", { city: picked });
@@ -259,8 +261,8 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
           setErrs({ net: s.errNet });
           return;
         }
-        const { position } = res.data;
-        setSaved((cur) => (cur ? { ...cur, position } : cur));
+        const { position, city_position } = res.data;
+        setSaved((cur) => (cur ? { ...cur, position, cityPosition: city_position ?? null } : cur));
       }
       setStep(3);
     } catch {
@@ -485,9 +487,22 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
             <Plate base={callBase} lime={callLime} alt="" w={720} h={518} eager />
             <span className="stamp">{s.onList}</span>
           </div>
+          {/* Big number = overall waitlist place; smaller line = place in the picked city.
+              No position (e.g. honeypot) → fall back to "on the list" / "in <city>". */}
           <div className="done-status">
-            {saved.position != null && <b className="tnum">#{saved.position}</b>}
-            <span>{saved.city === "other" ? s.onTheList : s.inCity(t.cities[saved.city])}</span>
+            {saved.position != null ? (
+              <>
+                <b className="tnum">#{saved.position}</b>
+                <span>{s.onWaitlist}</span>
+              </>
+            ) : (
+              <span>{saved.city === "other" ? s.onTheList : s.inCity(t.cities[saved.city])}</span>
+            )}
+            {saved.cityPosition != null && saved.city !== "other" && (
+              <p className="done-city tnum">
+                {s.cityRank(saved.cityPosition, t.cities[saved.city])}
+              </p>
+            )}
           </div>
           <ol className="dashrows">
             {[

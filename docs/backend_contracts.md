@@ -122,13 +122,14 @@ Sent from the "one last step" form. This is what actually puts someone on the li
 **Response 200**
 
 ```json
-{ "ok": true, "position": 305 }
+{ "ok": true, "position": 669, "city_position": 258 }
 ```
 
-- Set `confirmed_at` **only the first time** (re-sends are idempotent)
+- Set `confirmed_at` **only the first time** (re-sends are idempotent; return the same positions)
 - On that first confirm, if `referred_by` matches a **confirmed** row's `ref_code` → that referrer gets `referral_count + 1` (never yourself)
-- `position` = 304 (pre-existing list) + number of confirmed rows with `confirmed_at` ≤ this row's; minimum 305
-- Shown as "#305" on the done screen
+- `position` (required): place on the **overall** waitlist, all cities. How it's computed is up to the backend
+- `city_position` (**requested, optional**): place among rows with the **same `city`**. Send `null` or omit it until it's built; omit for `other`
+- Done screen: big "#669 on the waitlist", then a smaller "#258 in Bay Area" only when `city_position` is present and the city isn't `other`
 
 ## `POST /prospective/pro/signup/` — stage 3: demo call request
 

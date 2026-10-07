@@ -1336,9 +1336,21 @@
     color: var(--ink);
   }
   .done-status span {
+    display: block;
     font-size: 17px;
     font-weight: 600;
     color: var(--ink);
+  }
+  /* Secondary line: place within the picked city (only when the backend sends city_position). */
+  .done-city {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 3px 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
   }
   .dashrows {
     margin-top: 14px;
