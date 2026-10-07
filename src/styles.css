@@ -30,11 +30,11 @@
   --font-display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Overpass Mono", ui-monospace, monospace;
 
-  --fs-h1: 44px;
-  --fs-h2: 30px;
-  --fs-h3: 22px;
-  --fs-body: 18px;
-  --fs-small: 15px;
+  --fs-h1: 36px;
+  --fs-h2: 28px;
+  --fs-h3: 20px;
+  --fs-body: 15px;
+  --fs-small: 13px;
 
   --rule-solid: 2px solid var(--ink);
   --rule-dashed: 1.5px dashed var(--ink);
@@ -48,8 +48,9 @@
   :root {
     --fs-h1: 72px;
     --fs-h2: 44px;
-    --fs-h3: 26px;
-    --fs-body: 19px;
+    --fs-h3: 22px;
+    --fs-body: 16px;
+    --fs-small: 14px;
   }
 }
 
@@ -178,7 +179,7 @@
     background: var(--lime);
     color: var(--text);
     box-shadow: var(--shadow-md);
-    font: 700 18px var(--font-display);
+    font: 700 16px var(--font-display);
   }
   .btn:active {
     transform: translate(4px, 4px);
@@ -192,7 +193,7 @@
     padding: 0 12px;
     background: var(--obj);
     color: var(--ink);
-    font: 700 15px var(--font-display);
+    font: 700 14px var(--font-display);
     box-shadow: var(--shadow-sm);
   }
   .btn-2:active {
@@ -207,7 +208,7 @@
     min-height: 48px;
     padding: 0 16px;
     color: var(--ink);
-    font: 600 16px var(--font-display);
+    font: 600 15px var(--font-display);
     text-decoration: underline;
     text-underline-offset: 4px;
     cursor: pointer;
@@ -230,14 +231,14 @@
   .tag,
   .stamp,
   .pstamp {
-    font: 700 14px var(--font-mono);
+    font: 700 13px var(--font-mono);
     letter-spacing: 0.06em;
     color: var(--ink);
     border: var(--rule-solid);
   }
   .tag {
     display: inline-block;
-    font-size: 12px;
+    font-size: 11px;
     border-width: 1.5px;
     padding: 1px 5px;
     background: var(--lime);
@@ -251,7 +252,7 @@
   }
   .label {
     display: inline-block;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text);
     background: var(--lime);
@@ -266,7 +267,7 @@
     gap: 8px;
     min-height: 22px;
     margin-top: 12px;
-    font: 600 15px var(--font-display);
+    font: 600 14px var(--font-display);
     font-variant-numeric: tabular-nums;
     color: var(--ink);
   }
@@ -299,7 +300,7 @@
   .list li {
     position: relative;
     padding: 8px 0 8px 26px;
-    font-size: 17px;
+    font-size: 15px;
     border-top: var(--rule-soft);
   }
   .list li::before {
@@ -417,7 +418,7 @@
   .lang button {
     min-width: 48px;
     padding: 0 12px;
-    font: 700 14px var(--font-display);
+    font: 700 13px var(--font-display);
     color: var(--ink);
     cursor: pointer;
     transition:
@@ -430,7 +431,7 @@
   }
   .footer {
     padding-block: 30px 48px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--muted);
   }
   .footer p + p {
@@ -495,14 +496,14 @@
     transform: rotate(-2deg);
   }
   .chip p {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.25;
     color: var(--ink);
   }
   .chip small {
     display: block;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text);
   }
@@ -531,7 +532,7 @@
     justify-content: center;
     gap: 8px;
     height: 40px;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 32px;
     white-space: nowrap;
   }
@@ -569,7 +570,7 @@
     position: relative;
     padding: 13px 0 13px 36px;
     border-bottom: var(--rule-dashed);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
   }
   .pain:last-child {
@@ -584,7 +585,7 @@
   }
   .pain-fix {
     margin-top: 16px;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -616,7 +617,7 @@
     justify-content: center;
     writing-mode: vertical-rl;
     border-left: 2px dashed var(--ink);
-    font: 700 14px var(--font-mono);
+    font: 700 13px var(--font-mono);
     letter-spacing: 0.08em;
     color: var(--ink);
     background: repeating-linear-gradient(0deg, transparent 0 10px, var(--hatch) 10px 12px);
@@ -666,12 +667,12 @@
     border-bottom: var(--rule-soft);
   }
   .ph-top b {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--ink);
   }
   .ph-top small {
     display: block;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--muted);
   }
   .av {
@@ -684,7 +685,7 @@
     border-radius: 50%;
     background: var(--lime);
     border: var(--rule-solid);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -708,14 +709,14 @@
   }
   .ts {
     margin-top: 6px;
-    font: 500 14px var(--font-mono);
+    font: 500 13px var(--font-mono);
     color: var(--muted);
     text-align: center;
   }
   .bub {
     max-width: 86%;
     padding: 9px 12px;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.35;
     border: var(--rule-solid);
     border-radius: 16px;
@@ -775,7 +776,7 @@
   }
   .roles span {
     padding: 5px 10px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--ink);
     background: var(--obj);
@@ -803,7 +804,7 @@
     padding: 20px;
   }
   .pro-quote blockquote {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     color: var(--ink);
   }
@@ -847,7 +848,7 @@
     gap: 12px;
     padding: 7px 0;
     border-bottom: 1.5px dashed var(--line);
-    font-size: 16px;
+    font-size: 15px;
   }
   .row b {
     color: var(--ink);
@@ -855,7 +856,7 @@
   }
   .row.tot {
     border-bottom: 0;
-    font-size: 21px;
+    font-size: 19px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -869,7 +870,7 @@
   }
   .cmp .h span {
     padding: 10px 14px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
     border-bottom: var(--rule-solid);
@@ -880,7 +881,7 @@
   }
   .cmp .r span {
     padding: 11px 14px;
-    font-size: 16px;
+    font-size: 15px;
     border-bottom: var(--rule-soft);
   }
   .cmp .r:last-child span {
@@ -901,7 +902,7 @@
   .explain b {
     display: block;
     margin-bottom: 4px;
-    font-size: 18px;
+    font-size: 16px;
     color: var(--ink);
   }
   .explain p {
@@ -951,11 +952,11 @@
   }
   .stop b {
     display: block;
-    font-size: 19px;
+    font-size: 17px;
     color: var(--ink);
   }
   .stop span {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--muted);
   }
 
@@ -977,18 +978,18 @@
   }
   .founder-name {
     display: block;
-    font-size: 19px;
+    font-size: 17px;
     color: var(--ink);
   }
   .founder-role {
     display: block;
     margin-bottom: 6px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--ink);
   }
   .founder-bio {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.4;
   }
   .photo {
@@ -1040,11 +1041,11 @@
     gap: 8px;
   }
   .city-head b {
-    font-size: 19px;
+    font-size: 17px;
     color: var(--ink);
   }
   .city-head span {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--ink);
   }
@@ -1053,7 +1054,7 @@
     align-items: center;
     gap: 12px;
     margin-top: 12px;
-    font-size: 15px;
+    font-size: 14px;
   }
   /* Filled cells ink in one by one (--i × --step) once .in is set. */
   .bar {
@@ -1182,7 +1183,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--ink);
@@ -1209,19 +1210,19 @@
     background: var(--ink);
   }
   .flow-title {
-    font-size: 30px;
+    font-size: 26px;
     line-height: 1.1;
     font-weight: 700;
     color: var(--ink);
   }
   .flow-sub {
     margin-top: 6px;
-    font-size: 16px;
+    font-size: 15px;
   }
   .flabel {
     display: block;
     margin: 16px 0 7px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -1238,7 +1239,7 @@
     padding: 4px 8px;
     border: var(--rule-solid);
     background: var(--paper);
-    font: 600 16px var(--font-display);
+    font: 600 15px var(--font-display);
     color: var(--ink);
     text-align: center;
     cursor: pointer;
@@ -1259,7 +1260,7 @@
     border: var(--rule-solid);
     border-radius: 0;
     background: var(--paper);
-    font: 500 18px var(--font-display);
+    font: 500 16px var(--font-display);
     color: var(--text);
   }
   .field::placeholder {
@@ -1268,7 +1269,7 @@
   }
   .err {
     margin-top: 6px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--danger);
   }
@@ -1280,7 +1281,7 @@
     grid-template-columns: 28px 1fr;
     gap: 10px;
     margin-top: 18px;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.4;
     cursor: pointer;
   }
@@ -1331,13 +1332,13 @@
   }
   .done-status b {
     display: block;
-    font-size: 40px;
+    font-size: 36px;
     line-height: 1;
     color: var(--ink);
   }
   .done-status span {
     display: block;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--ink);
   }
@@ -1346,7 +1347,7 @@
     display: inline-block;
     margin-top: 10px;
     padding: 3px 12px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
     border: 1.5px solid var(--ink);
@@ -1358,7 +1359,7 @@
   }
   .dashrows li {
     padding: 9px 0;
-    font-size: 16px;
+    font-size: 15px;
     border-bottom: 1.5px dashed var(--line);
   }
   .dashrows b {
@@ -1372,13 +1373,13 @@
     background: var(--paper);
   }
   .card2-title {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--ink);
   }
   .card2-note {
     margin-top: 4px;
-    font-size: 15px;
+    font-size: 14px;
   }
   .card2-actions {
     display: grid;
@@ -1491,7 +1492,7 @@
     .pain-fix.desktop-only {
       max-width: 18ch;
       margin-top: 22px;
-      font-size: 24px;
+      font-size: 22px;
     }
 
     .day-section {
