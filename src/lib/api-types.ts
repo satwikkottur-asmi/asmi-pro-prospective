@@ -98,7 +98,7 @@ export type EventMeta = {
   page_view: { path: string }; // once per page load
   lang_switch: { to: Lang };
   cta_click: { source: string }; // opens the signup sheet
-  step1_error: { fields: string[] }; // once per failed submit: invalid form fields, or [ErrorCode | "network"]
+  step1_error: { fields: string[] }; // once per failed submit: invalid form fields, or [ErrorCode | "unknown" | "network"]
   step1_success: { city: CityKey };
   step2_submit: { trades: number; crew: CrewKey | null };
   share_click: { method: "share" | "copy" }; // what actually ran (share sheet, or clipboard fallback)

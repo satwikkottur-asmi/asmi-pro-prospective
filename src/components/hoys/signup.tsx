@@ -198,10 +198,11 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
       return;
     }
     setBusy(true);
+    const picked = city as CityKey;
     try {
       const res = await postSignup({
         stage: 1,
-        city: city as CityKey,
+        city: picked,
         service_city: serviceCity,
         name,
         phone,
@@ -214,10 +215,10 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
       });
       if (!res.ok) {
         setErrs(res.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
-        track("step1_error", { fields: [res.error ?? "network"] });
+        // Request landed but no error code (e.g. 502 HTML) → "unknown", not "network".
+        track("step1_error", { fields: [res.error ?? "unknown"] });
         return;
       }
-      const picked = city as CityKey;
       setCity(picked);
       setSaved({
         token: res.data.token,

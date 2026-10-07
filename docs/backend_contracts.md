@@ -168,7 +168,7 @@ Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately 
 | `page_view` | `{ path }` | Once per page load (in-site navigation doesn't resend) |
 | `lang_switch` | `{ to: "en" \| "es" }` | Language actually changed (re-clicking the active one sends nothing) |
 | `cta_click` | `{ source }` (`hero`, `final`) | "Join the waitlist" button; it also opens the signup sheet |
-| `step1_error` | `{ fields: string[] }` | Once per failed step-1 submit: the invalid form fields, or `[<ErrorCode>]` / `["network"]` |
+| `step1_error` | `{ fields: string[] }` | Once per failed step-1 submit: the invalid form fields, or `[<ErrorCode>]`, `["unknown"]` (HTTP error without a code) / `["network"]` (no response) |
 | `step1_success` | `{ city }` | Stage 1 accepted |
 | `step2_submit` | `{ trades: <count>, crew }` | Step-2 submit pressed |
 | `share_click` | `{ method: "share" \| "copy" }` | Share sheet opened, or link copied (also used when the share sheet isn't available) |
