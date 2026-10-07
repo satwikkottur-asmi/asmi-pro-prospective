@@ -42,13 +42,20 @@ const SignupSheet = lazy(() => import("./signup").then((m) => ({ default: m.Sign
 // - One step every random 10–60s → one fewer spot + one more join in a random launch city
 // - Stops for good after 100 steps; never drops below 1 unless the backend says 0
 // - Saved in localStorage so refreshes keep the same numbers and resume from there
+// - Expires 24h after the first step → returning visitors start fresh from backend numbers
 const PROMO_TICK_MIN_MS = 10_000;
 const PROMO_TICK_MAX_MS = 60_000;
 const PROMO_MAX_TICKS = 100;
+const PROMO_TTL_MS = 24 * 60 * 60 * 1000;
 const PROMO_KEY = "hoys_promo";
 
-type Promo = { ticks: number; joined: Record<LaunchCity, number> }; // joined = extra joins per city
-const EMPTY_PROMO: Promo = { ticks: 0, joined: { bay_area: 0, los_angeles: 0, new_york: 0 } };
+// joined = extra joins per city · startedAt = first step (ms), 0 = not started
+type Promo = { ticks: number; joined: Record<LaunchCity, number>; startedAt: number };
+const EMPTY_PROMO: Promo = {
+  ticks: 0,
+  joined: { bay_area: 0, los_angeles: 0, new_york: 0 },
+  startedAt: 0,
+};
 
 // Example job used in the payout card.
 const JOB_PRICE = 300;
@@ -445,13 +452,21 @@ function Final({ stats, spots }: { stats: Stats | undefined; spots: number | nul
   );
 }
 
-// Saved promo state; anything malformed → start fresh.
+// Saved promo state; anything malformed or expired → start fresh.
 function loadPromo(): Promo {
   try {
     const p = JSON.parse(localStorage.getItem(PROMO_KEY) ?? "null") as Promo | null;
     const valid =
-      Number.isInteger(p?.ticks) && LAUNCH_CITIES.every((c) => Number.isInteger(p?.joined?.[c]));
-    if (p && valid) return { ticks: Math.min(p.ticks, PROMO_MAX_TICKS), joined: p.joined };
+      Number.isInteger(p?.ticks) &&
+      LAUNCH_CITIES.every((c) => Number.isInteger(p?.joined?.[c])) &&
+      typeof p?.startedAt === "number" &&
+      Date.now() - p.startedAt < PROMO_TTL_MS;
+    if (p && valid)
+      return {
+        ticks: Math.min(p.ticks, PROMO_MAX_TICKS),
+        joined: p.joined,
+        startedAt: p.startedAt,
+      };
   } catch {
     /* corrupt or blocked storage */
   }
@@ -475,6 +490,7 @@ function usePromo(): Promo {
         const next = {
           ticks: cur.ticks + 1,
           joined: { ...cur.joined, [city]: cur.joined[city] + 1 },
+          startedAt: cur.startedAt || Date.now(),
         };
         try {
           localStorage.setItem(PROMO_KEY, JSON.stringify(next));
