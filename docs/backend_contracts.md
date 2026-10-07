@@ -206,4 +206,4 @@ How these numbers are computed is up to the backend; the frontend shows them as 
 
 - **Google Sheets sync:** after each of stages 1, 2 and 3, the old server POSTed the full row to an Apps Script URL (`APPS_SCRIPT_URL` + `APPS_SCRIPT_SECRET`). If ops reads leads from that sheet, the new backend must keep doing this (as an upsert, not an append, because of retries)
 - **Referral bump:** the old position formula subtracted `referral_count × REFERRAL_BUMP`. `REFERRAL_BUMP` is `0` and the UI hides the bump copy. If it's ever turned on, the backend must own the value and apply it to `position`
-- **Existing data:** current signups live in the old Lovable Cloud Supabase project; migrate them before switching
+- **Existing data:** none; the old Lovable Cloud Supabase project is shut down (nothing to migrate)
