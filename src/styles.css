@@ -1073,18 +1073,6 @@
   .bar.in i.f {
     background: var(--ink);
   }
-  .recent {
-    margin-top: 18px;
-    font-size: 15px;
-  }
-  .recent h3 {
-    font-size: 18px;
-  }
-  .recent p {
-    padding: 7px 0;
-    border-bottom: 1.5px dashed var(--line);
-  }
-
   /* /join page */
   .join-main {
     padding-block: 8px 40px;

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CITY_SPOTS, type CityKey, MIN_COUNT_TO_SHOW, RECENT_MIN } from "@/config";
+import { CITY_SPOTS, type CityKey, MIN_COUNT_TO_SHOW } from "@/config";
 import { getStats } from "./api";
 import type { Stats } from "./api-types";
 
@@ -23,5 +23,3 @@ export function spotsLeft(stats: Stats | undefined, city: CityKey | null): numbe
 }
 
 export const showCounts = (s?: Stats) => !!s && s.total >= MIN_COUNT_TO_SHOW;
-export const showRecent = (s?: Stats) =>
-  showCounts(s) && s!.recent7d >= RECENT_MIN && s!.recent.length > 0;

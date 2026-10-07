@@ -133,9 +133,6 @@ const en = {
     joined: (n: number) => `${n} pros joined`,
     full: "WAITLIST ONLY",
     next: "Join for the next group.",
-    recent: "Recent joins",
-    when: { today: "today", yesterday: "yesterday", "this week": "this week" },
-    defaultTrade: "Home service pro",
   },
   cities: {
     bay_area: "Bay Area",
@@ -355,9 +352,6 @@ const es: Dict = {
     joined: (n: number) => `${n} pros se unieron`,
     full: "SOLO LISTA DE ESPERA",
     next: "Únete para el próximo grupo.",
-    recent: "Se unieron hace poco",
-    when: { today: "hoy", yesterday: "ayer", "this week": "esta semana" },
-    defaultTrade: "Pro de servicios del hogar",
   },
   cities: {
     bay_area: "Bay Area",

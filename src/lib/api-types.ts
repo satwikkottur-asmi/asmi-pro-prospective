@@ -131,6 +131,4 @@ export type Stats = {
   total: number;
   remaining: number;
   cities: Record<CityKey, number>;
-  recent7d: number;
-  recent: { trade: TradeKey | null; place: string; when: "today" | "yesterday" | "this week" }[];
 };

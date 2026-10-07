@@ -181,9 +181,7 @@ Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately 
 {
   "total": 486,
   "remaining": 18,
-  "cities": { "bay_area": 120, "los_angeles": 40, "new_york": 18, "other": 4 },
-  "recent7d": 12,
-  "recent": [{ "trade": "hvac", "place": "Oakland", "when": "today" }]
+  "cities": { "bay_area": 120, "los_angeles": 40, "new_york": 18, "other": 4 }
 }
 ```
 
@@ -192,13 +190,12 @@ Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately 
 | `total` | 304 + confirmed rows |
 | `remaining` | max(0, 200 − confirmed) (not displayed today) |
 | `cities` | Confirmed rows per city key |
-| `recent7d` | Confirmed rows created in the last 7 days |
-| `recent` | Up to 6 confirmed joins from the last 7 days, **older than 15 min**, newest first. `trade` = first trade or `null`; `place` = neighborhood from zip prefix, else metro name (rows with no place are dropped); `when` ∈ `today` \| `yesterday` \| `this week` |
 
 - Count **confirmed** rows only
 - Send `Cache-Control: public, max-age=60, s-maxage=60`; errors → `503 { "error": "stats_unavailable" }`
-- **Where it shows:** the "Recent joins" list in the Spots section, only when `total ≥ 100` (`MIN_COUNT_TO_SHOW`) and `recent7d ≥ 5` (`RECENT_MIN`). The "N spots left in <city>" line also uses `cities`, but only once `CITY_SPOTS` caps are set in `config.ts` (all `null` today)
+- **Where it shows:** the "N spots left in <city>" line uses `cities`, but only once `CITY_SPOTS` caps are set in `config.ts` (all `null` today)
 - The frontend rejects responses without a numeric `total` (e.g. an HTML fallback page)
+- `recent7d` / `recent` are no longer used; the backend can stop sending them (extra fields are ignored)
 
 ## Side effects the old server had (decide before launch)
 

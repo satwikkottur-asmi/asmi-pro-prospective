@@ -15,11 +15,10 @@ import {
   type LaunchCity,
   PRO_QUOTE,
   SHOW_FOUNDER_PHOTOS,
-  type TradeKey,
 } from "@/config";
 import { useApp } from "@/lib/app-context";
 import { prefersReducedMotion } from "@/lib/motion";
-import { type Stats, showCounts, showRecent, spotsLeft, useStats } from "@/lib/stats";
+import { type Stats, showCounts, spotsLeft, useStats } from "@/lib/stats";
 import { Footer, TopBar } from "./chrome";
 import { CompanyProof } from "./company-proof";
 import { DayThread } from "./day-thread";
@@ -396,12 +395,8 @@ function CityCard({ city, joined }: { city: LaunchCity; joined: number }) {
   );
 }
 
-function Spots({ stats, tick }: { stats: Stats | undefined; tick: number }) {
+function Spots({ tick }: { tick: number }) {
   const { t } = useApp();
-  const tradeLabel = (k: string | null) =>
-    k && k !== "other" && k in t.sheet.tradeLabels
-      ? `${t.sheet.tradeLabels[k as TradeKey]} pro`
-      : t.spots.defaultTrade;
   return (
     <Section name="spots" heading={t.spots.h2} sub={t.spots.sub}>
       <div className="city-grid">
@@ -414,16 +409,6 @@ function Spots({ stats, tick }: { stats: Stats | undefined; tick: number }) {
           />
         ))}
       </div>
-      {stats && showRecent(stats) && (
-        <div className="recent">
-          <h3>{t.spots.recent}</h3>
-          {stats.recent.map((r, i) => (
-            <p key={i}>
-              {tradeLabel(r.trade)}, {r.place}, {t.spots.when[r.when]}
-            </p>
-          ))}
-        </div>
-      )}
     </Section>
   );
 }
@@ -479,7 +464,7 @@ export function Landing() {
         <PaidDetail />
         <How />
         <Team />
-        <Spots stats={stats} tick={tick} />
+        <Spots tick={tick} />
         <Final stats={stats} spots={promoSpots} />
       </main>
       <Footer />

@@ -10,13 +10,6 @@ const STATS: Stats = {
   total: 486,
   remaining: 18,
   cities: { bay_area: 120, los_angeles: 40, new_york: 18, other: 4 },
-  recent7d: 12,
-  recent: [
-    { trade: "hvac", place: "Oakland", when: "today" },
-    { trade: "plumbing", place: "Brooklyn", when: "today" },
-    { trade: "electrical", place: "Pasadena", when: "yesterday" },
-    { trade: null, place: "San Jose", when: "this week" },
-  ],
 };
 
 let position = 304;

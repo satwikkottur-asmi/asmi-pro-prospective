@@ -29,7 +29,6 @@ export const CITY_SPOTS: Record<LaunchCity, number | null> = {
   new_york: null,
 }; // real founding caps
 export const MIN_COUNT_TO_SHOW = 100;
-export const RECENT_MIN = 5;
 export const REFERRAL_BUMP = 0;
 export const COMMISSION_START_PERCENT = 15;
 export const NEXT_STEPS_TIMING = "";
