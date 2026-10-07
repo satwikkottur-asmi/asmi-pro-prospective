@@ -50,13 +50,17 @@ function StatusPage({
   );
 }
 
+// SPA rewrite serves unknown paths with HTTP 200 → noindex keeps them out of search (React 19 hoists <meta>).
 export function NotFound() {
   return (
-    <StatusPage title="404" body="This page does not exist.">
-      <Link to="/" className="btn-2 lime">
-        Go home
-      </Link>
-    </StatusPage>
+    <>
+      <meta name="robots" content="noindex" />
+      <StatusPage title="404" body="This page does not exist.">
+        <Link to="/" className="btn-2 lime">
+          Go home
+        </Link>
+      </StatusPage>
+    </>
   );
 }
 
