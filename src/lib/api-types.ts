@@ -5,10 +5,10 @@ import type { Lang, Variant } from "./dict";
 // - POST signup: one endpoint, behavior picked by `stage` (1 → 2 → 3, or "event")
 // - GET stats: public counters for the landing page
 
-// TODO: swap in the real paths once the backend is live.
+// Django backend paths. Keep the trailing slashes: Django can't redirect a POST to the slashed URL.
 export const API_PATHS = {
-  signup: "/api/public/signup",
-  stats: "/api/public/stats",
+  signup: "/prospective/pro/signup/",
+  stats: "/prospective/pro/stats/",
 } as const;
 
 // ── Shared ──────────────────────────────────────────────────────────────────

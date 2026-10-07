@@ -10,11 +10,12 @@ What the frontend expects from the waitlist backend.
 
 | Method | Path | Purpose | Called from |
 |---|---|---|---|
-| `POST` | `/api/public/signup` | Signup stages `1` → `2` → `3`, plus analytics (`stage: "event"`) | `signup.tsx`, `app-context.tsx` (`track`) |
-| `GET` | `/api/public/stats` | Public counters for the landing page | `stats.ts` (`useStats`) |
+| `POST` | `/prospective/pro/signup/` | Signup stages `1` → `2` → `3`, plus analytics (`stage: "event"`) | `signup.tsx`, `app-context.tsx` (`track`) |
+| `GET` | `/prospective/pro/stats/` | Public counters for the landing page | `stats.ts` (`useStats`) |
 
 - **Base URL:** `VITE_API_BASE_URL` (build-time). It's required in production, because the static Vercel deploy has no same-origin API
-- **Paths:** `API_PATHS` in `api-types.ts`. Placeholders until the backend picks its own paths
+- **Paths:** `API_PATHS` in `api-types.ts` (Django). Keep the trailing slashes: without them POSTs fail, because Django can't redirect a POST
+- **Local dev:** run the backend with `python manage.py runserver` and set `VITE_API_BASE_URL=http://localhost:8000` (scheme + port required)
 - **Format:** JSON in, JSON out (`Content-Type: application/json`)
 - **CORS:** if the API is on another origin, allow the site origin plus `Content-Type` (every POST is preflighted). Analytics use `fetch` with `keepalive`
 - **Body limit:** ≤10 KB → else `413 too_large`; invalid JSON → `400 bad_json`
@@ -41,7 +42,7 @@ Every failure is `{ "ok": false, "error": "<code>" }` with a 4xx/5xx status.
 - Analytics events are never retried
 - ⇒ **Stages 1–3 must be idempotent:** the same request can arrive twice if a response is lost
 
-## `POST /api/public/signup` — stage 1: create draft
+## `POST /prospective/pro/signup/` — stage 1: create draft
 
 Sent when the user submits name, phone and city.
 
@@ -90,7 +91,7 @@ Sent when the user submits name, phone and city.
 - Also store: `user_agent` (≤300), `src`, the `utm_*` fields and `referrer` from attribution; `referred_by` = `attribution.ref`
 - Rate limit: 10 signup requests per IP per 10 min → `429 rate_limited`
 
-## `POST /api/public/signup` — stage 2: confirm
+## `POST /prospective/pro/signup/` — stage 2: confirm
 
 Sent from the "one last step" form. This is what actually puts someone on the list.
 
@@ -128,7 +129,7 @@ Sent from the "one last step" form. This is what actually puts someone on the li
 - `position` = 304 (pre-existing list) + number of confirmed rows with `confirmed_at` ≤ this row's; minimum 305
 - Shown as "#305" on the done screen
 
-## `POST /api/public/signup` — stage 3: demo call request
+## `POST /prospective/pro/signup/` — stage 3: demo call request
 
 Sent when the user taps "Yes, call me" on the done screen.
 
@@ -138,7 +139,7 @@ Sent when the user taps "Yes, call me" on the done screen.
 
 **Response 200:** `{ "ok": true }` · Unknown token → `404 token`. The frontend shows "Done" whatever the result.
 
-## `POST /api/public/signup` — `stage: "event"` (analytics)
+## `POST /prospective/pro/signup/` — `stage: "event"` (analytics)
 
 Fire-and-forget: `keepalive`, never retried, response ignored.
 
@@ -172,7 +173,7 @@ Fire-and-forget: `keepalive`, never retried, response ignored.
 | `demo_request` | `{}` | "Yes, call me" |
 | `thread_complete` | `{}` | The "day with Hoys" chat animation finished |
 
-## `GET /api/public/stats`
+## `GET /prospective/pro/stats/`
 
 ```json
 {
