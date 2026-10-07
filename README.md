@@ -45,5 +45,5 @@ docs/backend_contracts.md  backend contract the frontend expects
 
 - Spanish copy needs native-speaker review before launch.
 - Launch switches live in `src/config.ts`.
-- Set `VITE_API_BASE_URL` in the Vercel project env (build-time). Signup API origin is `VITE_API_BASE_URL` (empty → same origin); paths live in `src/lib/api-types.ts`. Set `MOCK_API_CALL=true` to run without a backend.
+- Set `VITE_API_BASE_URL` in the Vercel project env (build-time). It's required: the static deploy has no same-origin API, so `vite build` fails without it (unless `MOCK_API_CALL=true`); paths live in `src/lib/api-types.ts`. Set `MOCK_API_CALL=true` to run without a backend.
 - Phone numbers are format-checked only; no SMS verification yet.
