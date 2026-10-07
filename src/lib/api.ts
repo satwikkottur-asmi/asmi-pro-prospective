@@ -29,8 +29,8 @@ const api = axios.create({
 });
 
 // MOCK_API_CALL=true (default false) → every request (incl. events' fetch adapter) is answered by src/lib/api-mock.ts.
-// Dynamic import keeps the mock out of production bundles.
-if (import.meta.env.MOCK_API_CALL?.toLowerCase() === "true") {
+// Dynamic import + literal flag (vite.config.ts `define`) → mock is dropped from builds when off.
+if (import.meta.env.MOCK_API_CALL === "true") {
   api.interceptors.request.use((config) => {
     config.adapter = (c) => import("./api-mock").then((m) => m.mockAdapter(c));
     return config;

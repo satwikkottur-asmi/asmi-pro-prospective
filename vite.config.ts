@@ -17,8 +17,10 @@ export default defineConfig(({ command, mode }) => {
     );
   }
   return {
-    // MOCK_API_CALL is exposed to the client too (see src/lib/api.ts).
-    envPrefix: ["VITE_", "MOCK_"],
+    // MOCK_API_CALL → client as a literal "true"/"false":
+    // - only this one var is exposed (no `MOCK_` envPrefix)
+    // - literal lets the build drop the mock import when off (src/lib/api.ts)
+    define: { "import.meta.env.MOCK_API_CALL": JSON.stringify(String(mock)) },
     resolve: { tsconfigPaths: true },
     plugins: [tailwindcss(), viteReact()],
   };

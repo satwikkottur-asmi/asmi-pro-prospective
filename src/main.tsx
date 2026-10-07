@@ -8,7 +8,7 @@ import { checkHealth } from "./lib/api";
 import { routes } from "./routes";
 
 // Dev only: say early when the local backend is down instead of failing on the first signup.
-if (import.meta.env.DEV && import.meta.env.MOCK_API_CALL?.toLowerCase() !== "true") {
+if (import.meta.env.DEV && import.meta.env.MOCK_API_CALL !== "true") {
   checkHealth().then((ok) => {
     if (!ok)
       console.warn(
