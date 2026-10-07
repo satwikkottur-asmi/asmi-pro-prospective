@@ -10,15 +10,21 @@ import {
 
 // Waitlist backend client (types: ./api-types.ts, contract: docs/backend_contracts.md).
 // - Base URL: VITE_API_BASE_URL (empty → same origin)
-// - Retries: network errors, timeouts, 5xx; 429 only with Retry-After
+// - Retries: network errors, 5xx (up to 3×); timeouts once; 429 only with Retry-After ≤ 5s
 // - 4xx validation errors are returned, never retried
+// - Timeouts sized for a cold backend (15–20s on the first hit after idle):
+//   signup 25s, stats 20s; a 2nd timeout means it's down, not waking → stop
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 400;
+const MAX_RETRY_AFTER_MS = 5_000; // longer → surface the error instead of a minutes-long spinner
+const SIGNUP_TIMEOUT_MS = 25_000;
+const STATS_TIMEOUT_MS = 20_000;
 
 declare module "axios" {
   interface AxiosRequestConfig {
     retries?: number;
     attempt?: number;
+    timedOut?: boolean; // an earlier attempt timed out
   }
 }
 
@@ -40,12 +46,18 @@ if (import.meta.env.MOCK_API_CALL === "true") {
 function retryAfterMs(error: AxiosError) {
   const header = error.response?.headers["retry-after"];
   const seconds = Number(header);
-  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : null;
+  const ms = seconds * 1000;
+  return Number.isFinite(ms) && ms > 0 && ms <= MAX_RETRY_AFTER_MS ? ms : null;
 }
+
+// ECONNABORTED: xhr/http adapters · ETIMEDOUT: fetch adapter / clarifyTimeoutError
+const isTimeout = (error: AxiosError) =>
+  error.code === "ECONNABORTED" || error.code === "ETIMEDOUT";
 
 function isRetryable(error: AxiosError) {
   const status = error.response?.status;
-  if (status == null) return error.code !== "ERR_CANCELED"; // network error or timeout
+  if (isTimeout(error)) return !error.config?.timedOut;
+  if (status == null) return error.code !== "ERR_CANCELED"; // network error
   if (status === 429) return retryAfterMs(error) != null;
   return status >= 500;
 }
@@ -57,7 +69,11 @@ api.interceptors.response.use(undefined, async (error: AxiosError) => {
   if (attempt >= (config.retries ?? MAX_RETRIES) || !isRetryable(error)) throw error;
   const backoff = BASE_DELAY_MS * 2 ** attempt + Math.random() * BASE_DELAY_MS;
   await new Promise((resolve) => setTimeout(resolve, retryAfterMs(error) ?? backoff));
-  return api.request({ ...config, attempt: attempt + 1 });
+  return api.request({
+    ...config,
+    attempt: attempt + 1,
+    timedOut: config.timedOut || isTimeout(error),
+  });
 });
 
 // ok=true → typed success body; ok=false → backend error code when it sent one.
@@ -72,7 +88,10 @@ export async function postSignup<R extends SignupRequest>(
   config: AxiosRequestConfig = {},
 ): Promise<SignupResult<SignupResponseFor<R>>> {
   try {
-    const { data } = await api.post<SignupResponseFor<R>>(API_PATHS.signup, body, config);
+    const { data } = await api.post<SignupResponseFor<R>>(API_PATHS.signup, body, {
+      timeout: SIGNUP_TIMEOUT_MS,
+      ...config,
+    });
     // A 2xx without `ok: true` (e.g. an HTML page) is not a success.
     return data?.ok === true ? { ok: true, data } : { ok: false, error: errorCode(data) };
   } catch (error) {
@@ -83,7 +102,7 @@ export async function postSignup<R extends SignupRequest>(
 }
 
 export async function getStats() {
-  const { data } = await api.get<Stats>(API_PATHS.stats, { retries: 1 });
+  const { data } = await api.get<Stats>(API_PATHS.stats, { retries: 1, timeout: STATS_TIMEOUT_MS });
   // Guards against a 200 HTML fallback page or a partial body (missing `cities` would crash render).
   const valid =
     typeof data?.total === "number" &&
@@ -95,8 +114,8 @@ export async function getStats() {
 }
 
 // Backend + database ready? GET /healthz/ → 200 "OK". Never throws; meant to run in the background.
-// - 3 attempts total (shared interceptor: exponential backoff on network errors, timeouts, 5xx)
-// - 30s per attempt: a cold backend can take 10–15s on the first hit
+// - Up to 3 attempts (shared interceptor: backoff on network errors, 5xx; timeouts retried once)
+// - 30s per attempt: a cold backend can take 15–20s on the first hit
 export async function checkHealth(): Promise<boolean> {
   try {
     const { data } = await api.get<string>(API_PATHS.health, {
@@ -111,6 +130,12 @@ export async function checkHealth(): Promise<boolean> {
 }
 
 // Fire-and-forget analytics: no retries (avoid double counts), keepalive survives page unload.
+// Default 10s timeout: nobody waits on it.
 export function postEvent(body: EventRequest) {
-  return postSignup(body, { retries: 0, adapter: "fetch", fetchOptions: { keepalive: true } });
+  return postSignup(body, {
+    retries: 0,
+    timeout: 10_000,
+    adapter: "fetch",
+    fetchOptions: { keepalive: true },
+  });
 }

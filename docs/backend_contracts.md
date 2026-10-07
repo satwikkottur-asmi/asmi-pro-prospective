@@ -37,8 +37,10 @@ Every failure is `{ "ok": false, "error": "<code>" }` with a 4xx/5xx status.
 | `server` | 500 | Anything else | Generic "try again" |
 
 **Client retry behavior (`api.ts`)**
-- Retries network errors, timeouts (10 s) and 5xx: up to 3×, exponential backoff
-- 429 is retried **only** if `Retry-After` (seconds) is sent → keep it short (a few seconds) or omit it
+- Retries network errors and 5xx: up to 3×, exponential backoff
+- Timeouts sized for a cold start (15–20 s on the first hit after idle): signup 25 s, stats 20 s, events 10 s. A timeout is retried **once**; a second one stops
+  - ⇒ A slow-but-successful first request can still be resent once → idempotency below matters
+- 429 is retried **only** if `Retry-After` (seconds) is sent and ≤ 5 s; longer → shown as an error right away
 - 4xx is never retried
 - Analytics events are never retried
 - ⇒ **Stages 1–3 must be idempotent:** the same request can arrive twice if a response is lost

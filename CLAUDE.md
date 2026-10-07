@@ -36,7 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **API client** — `src/lib/api.ts` (axios)
   - Base URL `VITE_API_BASE_URL` (required: `vite build` fails without it unless mocking; empty in dev → same origin)
   - `MOCK_API_CALL=true` (default false) → `src/lib/api-mock.ts` answers every call in the browser; exposed via `define` in `vite.config.ts` (mock dropped from builds when off)
-  - Retries network/timeout/5xx with backoff; 429 only with Retry-After; 4xx never retried
+  - Retries network/5xx with backoff; timeouts once (signup 25s, stats 20s: cold-start backend); 429 only with Retry-After ≤ 5s; 4xx never retried
   - `postSignup()` infers the response type from `body.stage`; resolves `{ ok: true, data }` or `{ ok: false, error? }` for any HTTP response; rejects only on network failure
   - `track()` is typed per event (`EventMeta`)
   - `getStats()` feeds `useStats()` (`src/lib/stats.ts`); counts stay hidden until thresholds in config
