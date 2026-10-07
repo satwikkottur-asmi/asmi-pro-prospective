@@ -179,23 +179,25 @@ Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately 
 
 ```json
 {
-  "total": 486,
-  "remaining": 18,
-  "cities": { "bay_area": 120, "los_angeles": 40, "new_york": 18, "other": 4 }
+  "total": 360,
+  "remaining": 144,
+  "cities": { "bay_area": 30, "los_angeles": 14, "new_york": 9, "other": 3 }
 }
 ```
 
-| Field | Rule |
-|---|---|
-| `total` | 304 + confirmed rows |
-| `remaining` | max(0, 200 − confirmed) (not displayed today) |
-| `cities` | Confirmed rows per city key |
+How these numbers are computed is up to the backend; the frontend shows them as sent.
 
-- Count **confirmed** rows only
+| Field | Type | Where it shows |
+|---|---|---|
+| `total` | integer | Not displayed; only gates the per-city "spots left" line (`total ≥ 100`, `MIN_COUNT_TO_SHOW`) |
+| `remaining` | integer ≥ 0 | "Only N spots left" under both "Join the waitlist" buttons. `0` → "This group is full" |
+| `cities` | integer per city key | "N pros joined" on the Bay Area / Los Angeles / New York cards; also "N spots left in <city>" once `CITY_SPOTS` caps are set in `config.ts` (all `null` today) |
+
+- Until stats load (or if the request fails), the spots line is hidden and city cards show the name only
 - Send `Cache-Control: public, max-age=60, s-maxage=60`; errors → `503 { "error": "stats_unavailable" }`
-- **Where it shows:** the "N spots left in <city>" line uses `cities`, but only once `CITY_SPOTS` caps are set in `config.ts` (all `null` today)
 - The frontend rejects responses without a numeric `total` (e.g. an HTML fallback page)
 - `recent7d` / `recent` are no longer used; the backend can stop sending them (extra fields are ignored)
+- `PROMO_COUNTER` (`config.ts`, off): when on, the shown number counts down from `remaining` on the client
 
 ## Side effects the old server had (decide before launch)
 

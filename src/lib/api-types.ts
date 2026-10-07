@@ -129,6 +129,6 @@ export type SignupResponseFor<R extends SignupRequest> = SignupResponses[R["stag
 
 export type Stats = {
   total: number;
-  remaining: number;
+  remaining: number; // founding spots left; the hero/final "Only N spots left" counts down from it
   cities: Record<CityKey, number>;
 };

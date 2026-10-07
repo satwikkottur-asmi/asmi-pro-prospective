@@ -14,6 +14,7 @@ import {
   LAUNCH_CITIES,
   type LaunchCity,
   PRO_QUOTE,
+  PROMO_COUNTER,
   SHOW_FOUNDER_PHOTOS,
 } from "@/config";
 import { useApp } from "@/lib/app-context";
@@ -25,16 +26,18 @@ import { DayThread } from "./day-thread";
 import { BrandText, CheckList, JoinCta, LiveLine, Plate, Section } from "./primitives";
 import { SignupSheet } from "./signup";
 
-// Promotional counters tick at a random 10–20s interval (frozen under reduced motion).
+// Promotional counters (PROMO_COUNTER in config.ts; frozen under reduced motion):
+// - Start from backend stats: "spots left" = `remaining`, city cards = `cities`; hidden until they load
+// - One step every random 10–60s → one fewer spot + one more join in a random launch city
+// - Stops for good after 100 steps; never drops below 1 unless the backend says 0
+// - Saved in localStorage so refreshes keep the same numbers and resume from there
 const PROMO_TICK_MIN_MS = 10_000;
-const PROMO_TICK_MAX_MS = 20_000;
-const PROMO_SPOTS_START = 486;
-const PROMO_SPOTS_END = 400;
-const CITY_JOIN_BASE: Record<LaunchCity, number> = {
-  bay_area: 550,
-  los_angeles: 433,
-  new_york: 278,
-};
+const PROMO_TICK_MAX_MS = 60_000;
+const PROMO_MAX_TICKS = 100;
+const PROMO_KEY = "hoys_promo";
+
+type Promo = { ticks: number; joined: Record<LaunchCity, number> }; // joined = extra joins per city
+const EMPTY_PROMO: Promo = { ticks: 0, joined: { bay_area: 0, los_angeles: 0, new_york: 0 } };
 
 // Example job used in the payout card.
 const JOB_PRICE = 300;
@@ -42,7 +45,7 @@ const JOB_FEE = Math.round((JOB_PRICE * COMMISSION_START_PERCENT) / 100);
 
 const BAR_CELLS = 20;
 
-function Hero({ spots }: { spots: number }) {
+function Hero({ spots }: { spots: number | null }) {
   const { t, variant } = useApp();
   return (
     <section className="hero-section">
@@ -372,20 +375,23 @@ function SpotBar({ taken, cap }: { taken: number; cap: number }) {
   );
 }
 
-function CityCard({ city, joined }: { city: LaunchCity; joined: number }) {
+// `joined` null → stats not loaded (or failed): show the city name only.
+function CityCard({ city, joined }: { city: LaunchCity; joined: number | null }) {
   const { t } = useApp();
   const cap = CITY_SPOTS[city];
-  const taken = cap == null ? joined : Math.min(joined, cap);
+  const taken = joined == null || cap == null ? joined : Math.min(joined, cap);
   return (
     <div className="obj city-card">
       <div className="city-head">
         <b>{t.cities[city]}</b>
-        <span className="tnum">
-          {cap == null ? t.spots.joined(joined) : t.spots.taken(taken, cap)}
-        </span>
+        {joined != null && taken != null && (
+          <span className="tnum">
+            {cap == null ? t.spots.joined(joined) : t.spots.taken(taken, cap)}
+          </span>
+        )}
       </div>
-      {cap != null && <SpotBar taken={taken} cap={cap} />}
-      {cap != null && taken >= cap && (
+      {cap != null && taken != null && <SpotBar taken={taken} cap={cap} />}
+      {cap != null && taken != null && taken >= cap && (
         <div className="city-full">
           <span className="stamp">{t.spots.full}</span>
           <span>{t.spots.next}</span>
@@ -395,17 +401,17 @@ function CityCard({ city, joined }: { city: LaunchCity; joined: number }) {
   );
 }
 
-function Spots({ tick }: { tick: number }) {
+// City counts = backend `cities` + the promo counter's extra joins (0 while it's off).
+function Spots({ stats, joined }: { stats: Stats | undefined; joined: Promo["joined"] }) {
   const { t } = useApp();
   return (
     <Section name="spots" heading={t.spots.h2} sub={t.spots.sub}>
       <div className="city-grid">
-        {LAUNCH_CITIES.map((city, i) => (
-          // Staggered so one city ticks up per promo tick.
+        {LAUNCH_CITIES.map((city) => (
           <CityCard
             key={city}
             city={city}
-            joined={CITY_JOIN_BASE[city] + Math.floor((tick + (2 - i)) / 3)}
+            joined={stats ? (stats.cities[city] ?? 0) + joined[city] : null}
           />
         ))}
       </div>
@@ -413,7 +419,7 @@ function Spots({ tick }: { tick: number }) {
   );
 }
 
-function Final({ stats, spots }: { stats: Stats | undefined; spots: number }) {
+function Final({ stats, spots }: { stats: Stats | undefined; spots: number | null }) {
   const { t, city } = useApp();
   const left = showCounts(stats) ? spotsLeft(stats, city) : null;
   return (
@@ -427,35 +433,68 @@ function Final({ stats, spots }: { stats: Stats | undefined; spots: number }) {
   );
 }
 
-function usePromoTick() {
-  const [tick, setTick] = useState(0);
+// Saved promo state; anything malformed → start fresh.
+function loadPromo(): Promo {
+  try {
+    const p = JSON.parse(localStorage.getItem(PROMO_KEY) ?? "null") as Promo | null;
+    const valid =
+      Number.isInteger(p?.ticks) && LAUNCH_CITIES.every((c) => Number.isInteger(p?.joined?.[c]));
+    if (p && valid) return { ticks: Math.min(p.ticks, PROMO_MAX_TICKS), joined: p.joined };
+  } catch {
+    /* corrupt or blocked storage */
+  }
+  return EMPTY_PROMO;
+}
+
+// PROMO_COUNTER off → no ticking, no storage; always EMPTY_PROMO.
+function usePromo(): Promo {
+  const [promo, setPromo] = useState(() => (PROMO_COUNTER ? loadPromo() : EMPTY_PROMO));
   useEffect(() => {
-    if (prefersReducedMotion()) return;
-    // Chained timeouts so each tick gets a fresh random delay.
+    if (!PROMO_COUNTER || prefersReducedMotion() || promo.ticks >= PROMO_MAX_TICKS) return;
+    // Chained timeouts: each step gets a fresh random delay.
     let timer: number;
     const schedule = () => {
       const delay = PROMO_TICK_MIN_MS + Math.random() * (PROMO_TICK_MAX_MS - PROMO_TICK_MIN_MS);
       timer = window.setTimeout(() => {
-        setTick((n) => n + 1);
-        schedule();
+        // Re-read storage so several open tabs advance one shared count instead of each their own.
+        const cur = loadPromo();
+        if (cur.ticks >= PROMO_MAX_TICKS) return setPromo(cur);
+        const city = LAUNCH_CITIES[Math.floor(Math.random() * LAUNCH_CITIES.length)] as LaunchCity;
+        const next = {
+          ticks: cur.ticks + 1,
+          joined: { ...cur.joined, [city]: cur.joined[city] + 1 },
+        };
+        try {
+          localStorage.setItem(PROMO_KEY, JSON.stringify(next));
+        } catch {
+          /* storage full or blocked: keep counting in memory */
+        }
+        setPromo(next);
+        if (next.ticks < PROMO_MAX_TICKS) schedule();
       }, delay);
     };
     schedule();
     return () => window.clearTimeout(timer);
+    // Runs once per mount; later progress is read from storage inside the timer.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return tick;
+  return promo;
 }
 
 export function Landing() {
   const { data: stats } = useStats();
-  const tick = usePromoTick();
-  const promoSpots = PROMO_SPOTS_START - (tick % (PROMO_SPOTS_START - PROMO_SPOTS_END + 1));
+  const promo = usePromo();
+  // Backend `remaining` minus counter steps (0 while PROMO_COUNTER is off). Null → line hidden.
+  // Floors at 1 so the counter alone never shows "full"; only a backend 0 does.
+  const remaining = stats?.remaining;
+  const spots =
+    remaining == null ? null : Math.max(remaining - promo.ticks, Math.min(remaining, 1));
 
   return (
     <>
       <TopBar />
       <main>
-        <Hero spots={promoSpots} />
+        <Hero spots={spots} />
         <Trust />
         <Pain />
         <TwoThings />
@@ -464,8 +503,8 @@ export function Landing() {
         <PaidDetail />
         <How />
         <Team />
-        <Spots tick={tick} />
-        <Final stats={stats} spots={promoSpots} />
+        <Spots stats={stats} joined={promo.joined} />
+        <Final stats={stats} spots={spots} />
       </main>
       <Footer />
       <SignupSheet />

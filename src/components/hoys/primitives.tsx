@@ -103,15 +103,15 @@ export function LiveLine({ children }: { children: ReactNode }) {
   );
 }
 
-// Primary CTA that opens the signup sheet, with the live spots line under it.
-export function JoinCta({ source, spots }: { source: string; spots: number }) {
+// Primary CTA that opens the signup sheet, with the live spots line under it (hidden until a real count arrives).
+export function JoinCta({ source, spots }: { source: string; spots: number | null }) {
   const { t, openSheet } = useApp();
   return (
     <div className="join-cta">
       <button type="button" className="btn" onClick={() => openSheet(source)}>
         {t.cta}
       </button>
-      <LiveLine>{t.live.remaining(spots)}</LiveLine>
+      {spots != null && <LiveLine>{t.live.remaining(spots)}</LiveLine>}
     </div>
   );
 }

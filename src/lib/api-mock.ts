@@ -6,10 +6,11 @@ import type { ApiError, SignupRequest, SignupResponses, Stage1Request, Stats } f
 // - Analytics events are logged to the console instead of sent
 const LATENCY_MS = 400;
 
+// Sample numbers; the real backend decides how they're computed.
 const STATS: Stats = {
-  total: 486,
-  remaining: 18,
-  cities: { bay_area: 120, los_angeles: 40, new_york: 18, other: 4 },
+  total: 360,
+  remaining: 144,
+  cities: { bay_area: 30, los_angeles: 14, new_york: 9, other: 3 },
 };
 
 let position = 304;

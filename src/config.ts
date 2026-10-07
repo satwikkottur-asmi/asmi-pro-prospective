@@ -29,6 +29,9 @@ export const CITY_SPOTS: Record<LaunchCity, number | null> = {
   new_york: null,
 }; // real founding caps
 export const MIN_COUNT_TO_SHOW = 100;
+// Ticking promo counter in landing.tsx (spots count down from backend `remaining`, random city
+// joins, saved in localStorage). Off for now → "spots left" shows backend `remaining` as-is.
+export const PROMO_COUNTER = false;
 export const REFERRAL_BUMP = 0;
 export const COMMISSION_START_PERCENT = 15;
 export const NEXT_STEPS_TIMING = "";
