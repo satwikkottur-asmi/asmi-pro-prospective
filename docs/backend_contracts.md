@@ -53,7 +53,7 @@ Sent when the user submits name, phone and city.
   "city": "bay_area",
   "service_city": "",
   "consent": true,
-  "consent_text": "Asmi can text or call me about the waitlist.",
+  "consent_text": "Hoys can text or call me about the waitlist.",
   "lang": "en",
   "variant": "a",
   "hp": "",
@@ -170,7 +170,7 @@ Fire-and-forget: `keepalive`, never retried, response ignored.
 | `step2_submit` | `{ trades: <count>, crew }` | Step-2 submit pressed |
 | `share_click` | `{ method: "share" \| "copy" }` | Share / copy referral link (both fire when native share is missing) |
 | `demo_request` | `{}` | "Yes, call me" |
-| `thread_complete` | `{}` | The "day with Asmi" chat animation finished |
+| `thread_complete` | `{}` | The "day with Hoys" chat animation finished |
 
 ## `GET /api/public/stats`
 

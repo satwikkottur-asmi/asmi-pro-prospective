@@ -1,6 +1,6 @@
 import type { RouteObject } from "react-router";
-import { Landing } from "@/components/asmi/landing";
-import { JoinPage, NotFound, RootLayout, RouteError } from "@/components/asmi/pages";
+import { Landing } from "@/components/hoys/landing";
+import { JoinPage, NotFound, RootLayout, RouteError } from "@/components/hoys/pages";
 
 export const routes: RouteObject[] = [
   {

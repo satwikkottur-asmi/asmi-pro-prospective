@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
-import logo from "@/assets/asmi-mark-ink.png";
+import logo from "@/assets/hoys-logo-blue.png";
 import { SUPPORT_EMAIL, SUPPORT_TEXT_NUMBER } from "@/config";
 import { useApp } from "@/lib/app-context";
 import type { Lang } from "@/lib/dict";
@@ -11,9 +11,9 @@ function Logo({ className, lazy }: { className: string; lazy?: boolean }) {
   return (
     <img
       src={logo}
-      alt="Asmi"
+      alt="Hoys"
       width={696}
-      height={264}
+      height={281}
       className={className}
       loading={lazy ? "lazy" : undefined}
     />
@@ -24,7 +24,7 @@ export function TopBar() {
   const { lang, setLang, t } = useApp();
   return (
     <header className="wrap top">
-      <Link to="/" aria-label="Asmi home">
+      <Link to="/" aria-label="Hoys home">
         <Logo className="logo-top" />
       </Link>
       <div className="top-actions">

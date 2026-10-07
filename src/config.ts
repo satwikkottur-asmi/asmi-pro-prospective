@@ -20,7 +20,7 @@ export type LaunchCity = (typeof LAUNCH_CITIES)[number];
 export type TradeKey = (typeof TRADE_KEYS)[number];
 export type CrewKey = (typeof CREW_KEYS)[number];
 
-export const SUPPORT_EMAIL = "support@asmiai.com";
+export const SUPPORT_EMAIL = "support@hoys.ai";
 export const SUPPORT_TEXT_NUMBER = ""; // US number pros can text; hidden when empty
 export const CITY_SPOTS: Record<LaunchCity, number | null> = {
   bay_area: null,

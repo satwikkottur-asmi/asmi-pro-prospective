@@ -121,10 +121,10 @@ export function DayThread() {
       <div className="phone" ref={ref}>
         <div className="ph-top">
           <span className="av" aria-hidden>
-            a
+            h
           </span>
           <div>
-            <b>Asmi</b>
+            <b>Hoys</b>
             <small>{t.day.biz}</small>
           </div>
         </div>
@@ -146,7 +146,7 @@ export function DayThread() {
               );
             return (
               <li key={i} className={`bub ${it.k}`}>
-                <span className="sr-only">{it.k === "in" ? "Asmi: " : `${t.day.you}: `}</span>
+                <span className="sr-only">{it.k === "in" ? "Hoys: " : `${t.day.you}: `}</span>
                 {isTyping ? (
                   <>
                     {/* Invisible copy sizes the typing bubble to the final message width. */}

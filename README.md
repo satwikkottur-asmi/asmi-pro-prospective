@@ -1,4 +1,4 @@
-# Asmi for Pros
+# Hoys for Pros
 
 Bilingual (en/es) waitlist landing page for home-service pros.
 
@@ -32,7 +32,7 @@ npm run dev
 src/
   main.tsx           entry: router + query client
   routes.tsx         routes (/, /join, 404) and error boundary
-  components/asmi/   landing sections, signup flow, shared primitives
+  components/hoys/   landing sections, signup flow, shared primitives
   lib/               app context, copy (dict.ts), API client (api.ts), stats
   config.ts          launch switches and domain keys
   styles.css         the single stylesheet (tokens → base → components → sections)

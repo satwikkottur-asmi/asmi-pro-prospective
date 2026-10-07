@@ -4,7 +4,7 @@ export type Variant = "a" | "b" | "c";
 
 const en = {
   meta: {
-    title: "Asmi for Pros: same hours, more paid jobs",
+    title: "Hoys for Pros: same hours, more paid jobs",
     desc: "Paid jobs with no lead fees, plus a crew that handles office work by text or voice in 30+ languages.",
   },
   top: { textUs: "Text us", langLabel: "Language" },
@@ -14,7 +14,7 @@ const en = {
       b: "Paid jobs. No lead fees.",
       c: "Paid jobs. No lead fees.",
     },
-    sub: "Customers pay first. Asmi handles office work by text or voice in 30+ languages.",
+    sub: "Customers pay first. Hoys handles office work by text or voice in 30+ languages.",
     chipTitle: "New paid job: AC tune-up",
     chipSub: "Thu 10 AM. You take home $255.",
     artAlt: "Riso illustration of a home service pro at work",
@@ -31,7 +31,7 @@ const en = {
     teamNames: ["Meta", "Google", "Amazon"],
     backedLabel: "Backed by leaders at",
     backedNames: ["Snap", "Meta", "Google"],
-    aria: "See who is behind Asmi",
+    aria: "See who is behind Hoys",
   },
   pain: {
     h2: "Sound familiar?",
@@ -40,10 +40,10 @@ const en = {
       "Quotes and invoices at 10 PM.",
       "Chasing customers to get paid.",
     ],
-    fix: "Asmi fixes all three.",
+    fix: "Hoys fixes all three.",
   },
   two: {
-    h2: "Asmi does two things for you.",
+    h2: "Hoys does two things for you.",
     paidLabel: "Paid jobs",
     paidH3: "Jobs that are already paid for.",
     paidList: [
@@ -63,7 +63,7 @@ const en = {
     noteFree: " No charge on your own jobs.",
   },
   day: {
-    h2: "A day with Asmi",
+    h2: "A day with Hoys",
     sub: "Text or talk to it like someone on your crew. It handles the rest.",
     biz: "AI crew for Ramos Heating and Air",
     you: "You",
@@ -93,12 +93,12 @@ const en = {
     job: "AC tune-up",
     when: "Thu 10 AM, 2 miles away",
     r1: "Customer paid first",
-    r2: "Asmi keeps (starts at 15%)",
+    r2: "Hoys keeps (starts at 15%)",
     tot: "You take home",
     take: "TAKE IT",
     pass: "PASS, NO COST",
     cmpL: "Lead sites",
-    cmpR: "Asmi",
+    cmpR: "Hoys",
     rows: [
       ["$35 to $200+ per lead", "$0 upfront"],
       ["Same lead sent to several pros", "One pro per job"],
@@ -107,7 +107,7 @@ const en = {
     ],
     whereQ: "Where do paid jobs come from?",
     whereA:
-      "More people now ask AI assistants to get things fixed at home. When they do, Asmi books a nearby pro, takes the payment first and holds it until the job is done.",
+      "More people now ask AI assistants to get things fixed at home. When they do, Hoys books a nearby pro, takes the payment first and holds it until the job is done.",
   },
   how: {
     h2: "How it works",
@@ -118,7 +118,7 @@ const en = {
     ],
   },
   team: {
-    h2: "Who is behind Asmi",
+    h2: "Who is behind Hoys",
     rishiRole: "Co-founder and CEO",
     rishi:
       "Built Asia's largest tech platform for small store owners: 100,000+ shops. Backed by top investors and founders of DoorDash and Zoom.",
@@ -162,7 +162,7 @@ const en = {
     phone: "Mobile number",
     otherCity: "Your city",
     otherCityPh: "City, state",
-    consentBold: "I agree Asmi may text or call me about the waitlist.",
+    consentBold: "I agree Hoys may text or call me about the waitlist.",
     saving: "Saving...",
     errCity: "Pick where you work.",
     errName: "Add your name.",
@@ -207,21 +207,21 @@ const en = {
     share: "Share link",
     copy: "Copy link",
     copied: "Copied",
-    shareText: "Asmi sends paid jobs to pros. No lead fees. Join the waitlist:",
+    shareText: "Hoys sends paid jobs to pros. No lead fees. Join the waitlist:",
     bump: (n: number) => `Each pro who joins with your link moves you up ${n} spots.`,
     call: "Want a quick call with our team?",
     callBtn: "Yes, call me",
-    callDone: "Done. Someone from Asmi will call you.",
+    callDone: "Done. Someone from Hoys will call you.",
   },
   // Exact consent text stored with each signup, in the language shown.
-  consentText: "Asmi can text or call me about the waitlist.",
+  consentText: "Hoys can text or call me about the waitlist.",
 };
 
 export type Dict = typeof en;
 
 const es: Dict = {
   meta: {
-    title: "Asmi para Pros: mismas horas, más trabajos pagados",
+    title: "Hoys para Pros: mismas horas, más trabajos pagados",
     desc: "Trabajos pagados sin pagar por leads, más ayuda con la oficina por texto o voz en más de 30 idiomas.",
   },
   top: { textUs: "Escríbenos", langLabel: "Idioma" },
@@ -231,7 +231,7 @@ const es: Dict = {
       b: "Trabajos pagados. Sin pagar por leads.",
       c: "Trabajos pagados. Sin pagar por leads.",
     },
-    sub: "El cliente paga primero. Asmi se encarga de la oficina por texto o voz en más de 30 idiomas.",
+    sub: "El cliente paga primero. Hoys se encarga de la oficina por texto o voz en más de 30 idiomas.",
     chipTitle: "Nuevo trabajo pagado: mantenimiento de AC",
     chipSub: "Jue 10 AM. Te llevas $255.",
     artAlt: "Ilustración de un pro de servicios del hogar trabajando",
@@ -250,7 +250,7 @@ const es: Dict = {
     teamNames: ["Meta", "Google", "Amazon"],
     backedLabel: "Respaldado por líderes en",
     backedNames: ["Snap", "Meta", "Google"],
-    aria: "Mira quién está detrás de Asmi",
+    aria: "Mira quién está detrás de Hoys",
   },
   pain: {
     h2: "¿Te suena?",
@@ -259,10 +259,10 @@ const es: Dict = {
       "Cotizaciones y facturas a las 10 PM.",
       "Perseguir clientes para que te paguen.",
     ],
-    fix: "Asmi arregla las tres.",
+    fix: "Hoys arregla las tres.",
   },
   two: {
-    h2: "Asmi hace dos cosas por ti.",
+    h2: "Hoys hace dos cosas por ti.",
     paidLabel: "Trabajos pagados",
     paidH3: "Trabajos que ya están pagados.",
     paidList: [
@@ -282,7 +282,7 @@ const es: Dict = {
     noteFree: " Sin costo en tus propios trabajos.",
   },
   day: {
-    h2: "Un día con Asmi",
+    h2: "Un día con Hoys",
     sub: "Escríbele o háblale como a alguien de tu equipo. Se encarga del resto.",
     biz: "Equipo de IA de Ramos Heating and Air",
     you: "Tú",
@@ -312,12 +312,12 @@ const es: Dict = {
     job: "Mantenimiento de AC",
     when: "Jue 10 AM, a 2 millas",
     r1: "El cliente pagó primero",
-    r2: "Asmi se queda (empieza en 15%)",
+    r2: "Hoys se queda (empieza en 15%)",
     tot: "Te llevas",
     take: "LO TOMO",
     pass: "PASO, SIN COSTO",
     cmpL: "Sitios de leads",
-    cmpR: "Asmi",
+    cmpR: "Hoys",
     rows: [
       ["$35 a $200+ por lead", "$0 por adelantado"],
       ["El mismo lead va a varios pros", "Un pro por trabajo"],
@@ -326,7 +326,7 @@ const es: Dict = {
     ],
     whereQ: "¿De dónde salen los trabajos pagados?",
     whereA:
-      "Cada vez más gente le pide a asistentes de IA que les arreglen cosas en casa. Cuando lo hacen, Asmi agenda a un pro cercano, cobra primero y guarda el pago hasta que se termina el trabajo.",
+      "Cada vez más gente le pide a asistentes de IA que les arreglen cosas en casa. Cuando lo hacen, Hoys agenda a un pro cercano, cobra primero y guarda el pago hasta que se termina el trabajo.",
   },
   how: {
     h2: "Cómo funciona",
@@ -340,7 +340,7 @@ const es: Dict = {
     ],
   },
   team: {
-    h2: "Quién está detrás de Asmi",
+    h2: "Quién está detrás de Hoys",
     rishiRole: "Cofundador y CEO",
     rishi:
       "Construyó la plataforma tecnológica más grande de Asia para pequeños comerciantes: más de 100,000 tiendas. Respaldado por grandes inversionistas y los fundadores de DoorDash y Zoom.",
@@ -384,7 +384,7 @@ const es: Dict = {
     phone: "Número de celular",
     otherCity: "Tu ciudad",
     otherCityPh: "Ciudad, estado",
-    consentBold: "Acepto que Asmi me mande textos o llame sobre la lista de espera.",
+    consentBold: "Acepto que Hoys me mande textos o llame sobre la lista de espera.",
     saving: "Guardando...",
     errCity: "Escoge dónde trabajas.",
     errName: "Pon tu nombre.",
@@ -429,13 +429,13 @@ const es: Dict = {
     share: "Compartir link",
     copy: "Copiar link",
     copied: "Copiado",
-    shareText: "Asmi manda trabajos pagados a pros. Sin pagar por leads. Únete a la lista:",
+    shareText: "Hoys manda trabajos pagados a pros. Sin pagar por leads. Únete a la lista:",
     bump: (n: number) => `Cada pro que se une con tu link te sube ${n} lugares.`,
     call: "¿Quieres una llamada rápida con nuestro equipo?",
     callBtn: "Sí, llámenme",
-    callDone: "Listo. Alguien de Asmi te va a llamar.",
+    callDone: "Listo. Alguien de Hoys te va a llamar.",
   },
-  consentText: "Asmi me puede mandar textos o llamar sobre la lista de espera.",
+  consentText: "Hoys me puede mandar textos o llamar sobre la lista de espera.",
 };
 
 export const dicts: Record<Lang, Dict> = { en, es };
