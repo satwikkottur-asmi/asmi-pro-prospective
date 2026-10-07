@@ -14,7 +14,7 @@ const en = {
       b: "Paid jobs. No lead fees.",
       c: "Paid jobs. No lead fees.",
     },
-    sub: "Customers pay first. Hoys handles office work by text or voice in 30+ languages.",
+    sub: "Customers pay first. {brand} handles office work by text or voice in 30+ languages.",
     chipTitle: "New paid job: AC tune-up",
     chipSub: "Thu 10 AM. You take home $255.",
     artAlt: "Riso illustration of a home service pro at work",
@@ -43,7 +43,7 @@ const en = {
     fix: "Hoys fixes all three.",
   },
   two: {
-    h2: "Hoys does two things for you.",
+    h2: "{brand} does two things for you.",
     paidLabel: "Paid jobs",
     paidH3: "Jobs that are already paid for.",
     paidList: [
@@ -107,7 +107,7 @@ const en = {
     ],
     whereQ: "Where do paid jobs come from?",
     whereA:
-      "More people now ask AI assistants to get things fixed at home. When they do, Hoys books a nearby pro, takes the payment first and holds it until the job is done.",
+      "More people now ask AI assistants to get things fixed at home. When they do, {brand} books a nearby pro, takes the payment first and holds it until the job is done.",
   },
   how: {
     h2: "How it works",
@@ -231,7 +231,7 @@ const es: Dict = {
       b: "Trabajos pagados. Sin pagar por leads.",
       c: "Trabajos pagados. Sin pagar por leads.",
     },
-    sub: "El cliente paga primero. Hoys se encarga de la oficina por texto o voz en más de 30 idiomas.",
+    sub: "El cliente paga primero. {brand} se encarga de la oficina por texto o voz en más de 30 idiomas.",
     chipTitle: "Nuevo trabajo pagado: mantenimiento de AC",
     chipSub: "Jue 10 AM. Te llevas $255.",
     artAlt: "Ilustración de un pro de servicios del hogar trabajando",
@@ -262,7 +262,7 @@ const es: Dict = {
     fix: "Hoys arregla las tres.",
   },
   two: {
-    h2: "Hoys hace dos cosas por ti.",
+    h2: "{brand} hace dos cosas por ti.",
     paidLabel: "Trabajos pagados",
     paidH3: "Trabajos que ya están pagados.",
     paidList: [
@@ -326,7 +326,7 @@ const es: Dict = {
     ],
     whereQ: "¿De dónde salen los trabajos pagados?",
     whereA:
-      "Cada vez más gente le pide a asistentes de IA que les arreglen cosas en casa. Cuando lo hacen, Hoys agenda a un pro cercano, cobra primero y guarda el pago hasta que se termina el trabajo.",
+      "Cada vez más gente le pide a asistentes de IA que les arreglen cosas en casa. Cuando lo hacen, {brand} agenda a un pro cercano, cobra primero y guarda el pago hasta que se termina el trabajo.",
   },
   how: {
     h2: "Cómo funciona",

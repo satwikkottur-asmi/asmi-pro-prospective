@@ -348,8 +348,39 @@
     animation: settle 400ms ease-out both;
   }
 
+  /* Brand name inside copy (<Brand />): logo ink + weight.
+   * .marked → hand-drawn highlighter: tilted lime block behind the word, text stays straight.
+   * - Tilt via --mark-tilt (≈ −3° ≈ 5% slope); uneven radii + overhang read as a pen stroke
+   * - Text on lime is --text (design-system rule) */
+  .brand {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .brand.marked {
+    --mark-tilt: -3deg;
+    position: relative;
+    isolation: isolate;
+    white-space: nowrap;
+    padding-inline: 0.1em;
+    color: var(--text);
+  }
+  .brand.marked::before {
+    content: "";
+    position: absolute;
+    inset: 0.08em -0.08em 0.02em -0.12em;
+    z-index: -1;
+    background: var(--lime);
+    border-radius: 0.25em 0.5em 0.3em 0.55em / 0.55em 0.3em 0.5em 0.25em;
+    transform: rotate(var(--mark-tilt)) skewX(-6deg);
+  }
+
   /* ── Chrome: top bar, footer, status pages ───────────────────────────── */
 
+  /* Top bar sits on its own strip so the logo reads apart from the hero headline. */
+  .top-band {
+    background: var(--obj);
+    border-bottom: var(--rule-solid);
+  }
   .top {
     display: flex;
     justify-content: space-between;
@@ -433,7 +464,7 @@
   /* ── Hero & trust band ────────────────────────────────────────────────── */
 
   .hero-section {
-    padding: 12px 0 34px;
+    padding: 28px 0 34px;
   }
   .hero-layout {
     display: grid;

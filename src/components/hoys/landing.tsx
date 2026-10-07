@@ -23,7 +23,7 @@ import { type Stats, showCounts, showRecent, spotsLeft, useStats } from "@/lib/s
 import { Footer, TopBar } from "./chrome";
 import { CompanyProof } from "./company-proof";
 import { DayThread } from "./day-thread";
-import { CheckList, JoinCta, LiveLine, Plate, Section } from "./primitives";
+import { BrandText, CheckList, JoinCta, LiveLine, Plate, Section } from "./primitives";
 import { SignupSheet } from "./signup";
 
 // Promotional counters tick every 10s (frozen under reduced motion).
@@ -49,7 +49,9 @@ function Hero({ spots }: { spots: number }) {
       <div className="wrap hero-layout">
         <div className="hero-copy">
           <h1>{t.hero.h1[variant]}</h1>
-          <p className="sub hero-sub">{t.hero.sub}</p>
+          <p className="sub hero-sub">
+            <BrandText text={t.hero.sub} mark />
+          </p>
           <JoinCta source="hero" spots={spots} />
         </div>
         <div className="hero-visual">
@@ -154,7 +156,7 @@ function TwoThings() {
   const { t } = useApp();
   const tw = t.two;
   return (
-    <Section name="two" heading={tw.h2}>
+    <Section name="two" heading={<BrandText text={tw.h2} mark />}>
       <div className="split">
         <FeatureCard
           art={
@@ -255,7 +257,9 @@ function PaidDetail() {
           </div>
           <div className="explain">
             <b>{p.whereQ}</b>
-            <p>{p.whereA}</p>
+            <p>
+              <BrandText text={p.whereA} />
+            </p>
           </div>
         </div>
       </div>

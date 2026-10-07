@@ -23,31 +23,33 @@ function Logo({ className, lazy }: { className: string; lazy?: boolean }) {
 export function TopBar() {
   const { lang, setLang, t } = useApp();
   return (
-    <header className="wrap top">
-      <Link to="/" aria-label="Hoys home">
-        <Logo className="logo-top" />
-      </Link>
-      <div className="top-actions">
-        {SUPPORT_TEXT_NUMBER && (
-          <a className="top-text" href={`sms:${SUPPORT_TEXT_NUMBER}`}>
-            {t.top.textUs}
-          </a>
-        )}
-        <div className="lang" role="group" aria-label={t.top.langLabel}>
-          {LANGS.map((l) => (
-            <button
-              key={l}
-              type="button"
-              lang={l}
-              aria-pressed={lang === l}
-              onClick={() => setLang(l)}
-            >
-              {l.toUpperCase()}
-            </button>
-          ))}
+    <div className="top-band">
+      <header className="wrap top">
+        <Link to="/" aria-label="Hoys home">
+          <Logo className="logo-top" />
+        </Link>
+        <div className="top-actions">
+          {SUPPORT_TEXT_NUMBER && (
+            <a className="top-text" href={`sms:${SUPPORT_TEXT_NUMBER}`}>
+              {t.top.textUs}
+            </a>
+          )}
+          <div className="lang" role="group" aria-label={t.top.langLabel}>
+            {LANGS.map((l) => (
+              <button
+                key={l}
+                type="button"
+                lang={l}
+                aria-pressed={lang === l}
+                onClick={() => setLang(l)}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </div>
   );
 }
 
