@@ -199,27 +199,32 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     }
     setBusy(true);
     try {
-      const { ok, data } = await postSignup<{ token: string; ref_code: string }>({
+      const res = await postSignup({
         stage: 1,
-        city,
+        city: city as CityKey,
         service_city: serviceCity,
         name,
         phone,
-        consent,
+        consent: true,
         lang,
         variant,
         hp,
         consent_text: t.consentText,
         attribution: getAttribution(),
       });
-      if (!ok) {
-        setErrs(data.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
-        track("step1_error", { field: data.error || "network" });
+      if (!res.ok) {
+        setErrs(res.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
+        track("step1_error", { field: res.error ?? "network" });
         return;
       }
       const picked = city as CityKey;
       setCity(picked);
-      setSaved({ token: data.token, ref_code: data.ref_code, position: null, city: picked });
+      setSaved({
+        token: res.data.token,
+        ref_code: res.data.ref_code,
+        position: null,
+        city: picked,
+      });
       track("step1_success", { city: picked });
       setStep(2);
     } catch {
@@ -241,7 +246,7 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     track("step2_submit", { trades: trades.length, crew });
     try {
       if (saved?.token) {
-        const { ok, data } = await postSignup<{ position?: number }>({
+        const res = await postSignup({
           stage: 2,
           token: saved.token,
           trades,
@@ -251,11 +256,12 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
           business_name: biz,
           email,
         });
-        if (!ok) {
+        if (!res.ok) {
           setErrs({ net: s.errNet });
           return;
         }
-        setSaved((cur) => (cur ? { ...cur, position: data.position ?? null } : cur));
+        const { position } = res.data;
+        setSaved((cur) => (cur ? { ...cur, position } : cur));
       }
       setStep(3);
     } catch {

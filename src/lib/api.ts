@@ -1,12 +1,17 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
+import {
+  API_PATHS,
+  type ErrorCode,
+  type EventRequest,
+  type SignupRequest,
+  type SignupResponseFor,
+  type Stats,
+} from "./api-types";
 
-// Waitlist backend client (contract: docs/api.md).
+// Waitlist backend client (types: ./api-types.ts, contract: docs/backend_contracts.md).
 // - Base URL: VITE_API_BASE_URL (empty → same origin)
 // - Retries: network errors, timeouts, 5xx; 429 only with Retry-After
 // - 4xx validation errors are returned, never retried
-// TODO: swap in the real paths once the backend is live.
-const SIGNUP_PATH = "/api/public/signup";
-const STATS_PATH = "/api/public/stats";
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 400;
 
@@ -46,29 +51,36 @@ api.interceptors.response.use(undefined, async (error: AxiosError) => {
   return api.request({ ...config, attempt: attempt + 1 });
 });
 
-type SignupResult<T> = { ok: boolean; data: T & { ok?: boolean; error?: string } };
+// ok=true → typed success body; ok=false → backend error code when it sent one.
+export type SignupResult<T> = { ok: true; data: T } | { ok: false; error?: ErrorCode | undefined };
+
+const errorCode = (data: unknown) =>
+  (data as { error?: ErrorCode } | undefined)?.error ?? undefined;
 
 // Resolves for any HTTP response (ok=false on 4xx/5xx); rejects only when the request never landed.
-export async function postSignup<T = Record<string, unknown>>(
-  body: unknown,
+export async function postSignup<R extends SignupRequest>(
+  body: R,
   config: AxiosRequestConfig = {},
-): Promise<SignupResult<T>> {
+): Promise<SignupResult<SignupResponseFor<R>>> {
   try {
-    const { data } = await api.post<SignupResult<T>["data"]>(SIGNUP_PATH, body, config);
-    return { ok: !!data?.ok, data: data ?? ({} as SignupResult<T>["data"]) };
+    const { data } = await api.post<SignupResponseFor<R>>(API_PATHS.signup, body, config);
+    // A 2xx without `ok: true` (e.g. an HTML page) is not a success.
+    return data?.ok === true ? { ok: true, data } : { ok: false, error: errorCode(data) };
   } catch (error) {
     const response = axios.isAxiosError(error) ? error.response : undefined;
     if (!response) throw error;
-    return { ok: false, data: (response.data ?? {}) as SignupResult<T>["data"] };
+    return { ok: false, error: errorCode(response.data) };
   }
 }
 
-export async function getStats<T>() {
-  const { data } = await api.get<T>(STATS_PATH, { retries: 1 });
+export async function getStats() {
+  const { data } = await api.get<Stats>(API_PATHS.stats, { retries: 1 });
+  // Guards against a 200 HTML fallback page being read as stats.
+  if (typeof data?.total !== "number") throw new Error("Unexpected stats response");
   return data;
 }
 
 // Fire-and-forget analytics: no retries (avoid double counts), keepalive survives page unload.
-export function postEvent(body: unknown) {
+export function postEvent(body: EventRequest) {
   return postSignup(body, { retries: 0, adapter: "fetch", fetchOptions: { keepalive: true } });
 }
