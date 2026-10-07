@@ -59,6 +59,8 @@ export function getAttribution(): Attribution {
 }
 
 let ctxSnapshot = { variant: "a" as Variant, lang: "en" as Lang };
+// One page_view per page load (StrictMode remounts the provider in dev).
+let pageViewSent = false;
 
 // Events without a payload take no meta argument; the rest require theirs (see EventMeta).
 export function track<N extends EventName>(
@@ -123,7 +125,10 @@ export function AppProvider({
       if (sc) setCityState(sc);
     } else sessionStorage.setItem("hoys_city", city);
     ctxSnapshot = { variant, lang: initial };
-    track("page_view", { path: window.location.pathname });
+    if (!pageViewSent) {
+      pageViewSent = true;
+      track("page_view", { path: window.location.pathname });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -144,7 +149,6 @@ export function AppProvider({
   }, []);
   const openSheet = useCallback((source: string) => {
     track("cta_click", { source });
-    track("sheet_open", { source });
     setSheetOpen(true);
   }, []);
   const closeSheet = useCallback(() => setSheetOpen(false), []);

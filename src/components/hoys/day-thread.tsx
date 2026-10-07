@@ -39,6 +39,7 @@ export function DayThread() {
   const [role, setRole] = useState<number | null>(null);
   const [runId, setRunId] = useState(0);
   const timers = useRef<number[]>([]);
+  const completed = useRef(false); // thread_complete: first playthrough only, not replays
 
   const play = () => {
     timers.current.forEach(clearTimeout);
@@ -58,7 +59,10 @@ export function DayThread() {
           setTyping(-1);
           setShown(i + 1);
           if (it.role != null) setRole(it.role);
-          if (i === SCRIPT.length - 1) track("thread_complete");
+          if (i === SCRIPT.length - 1 && !completed.current) {
+            completed.current = true;
+            track("thread_complete");
+          }
         }, at),
       );
       at += it.k === "ts" ? 250 : 1400;

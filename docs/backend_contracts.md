@@ -141,7 +141,7 @@ Sent when the user taps "Yes, call me" on the done screen.
 
 ## `POST /prospective/pro/signup/` — `stage: "event"` (analytics)
 
-Fire-and-forget: `keepalive`, never retried, response ignored.
+Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately per user action (no batching). One event per outcome: no paired or per-field events.
 
 ```json
 {
@@ -161,17 +161,18 @@ Fire-and-forget: `keepalive`, never retried, response ignored.
 
 | `name` | `meta` | Fired when |
 |---|---|---|
-| `page_view` | `{ path }` | App mounts (twice in dev because of React StrictMode) |
-| `lang_switch` | `{ to: "en" \| "es" }` | Language toggle |
-| `cta_click` | `{ source }` (`hero`, `final`) | "Join the waitlist" button |
-| `sheet_open` | `{ source }` | Signup sheet opens (always paired with `cta_click`) |
-| `step1_submit` | `{}` | Step-1 submit pressed |
-| `step1_error` | `{ field }` | Per invalid field, backend error code, or `network` |
+| `page_view` | `{ path }` | Once per page load (in-site navigation doesn't resend) |
+| `lang_switch` | `{ to: "en" \| "es" }` | Language actually changed (re-clicking the active one sends nothing) |
+| `cta_click` | `{ source }` (`hero`, `final`) | "Join the waitlist" button; it also opens the signup sheet |
+| `step1_error` | `{ fields: string[] }` | Once per failed step-1 submit: the invalid form fields, or `[<ErrorCode>]` / `["network"]` |
 | `step1_success` | `{ city }` | Stage 1 accepted |
 | `step2_submit` | `{ trades: <count>, crew }` | Step-2 submit pressed |
-| `share_click` | `{ method: "share" \| "copy" }` | Share / copy referral link (both fire when native share is missing) |
+| `share_click` | `{ method: "share" \| "copy" }` | Share sheet opened, or link copied (also used when the share sheet isn't available) |
 | `demo_request` | `{}` | "Yes, call me" |
-| `thread_complete` | `{}` | The "day with Hoys" chat animation finished |
+| `thread_complete` | `{}` | The "day with Hoys" chat animation finished (first playthrough per page load) |
+
+- Step-1 submits = `step1_success` + `step1_error`
+- Removed: `sheet_open` (duplicated `cta_click`) and `step1_submit` (derivable)
 
 ## `GET /prospective/pro/stats/`
 

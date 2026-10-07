@@ -41,7 +41,7 @@ export function TopBar() {
                 type="button"
                 lang={l}
                 aria-pressed={lang === l}
-                onClick={() => setLang(l)}
+                onClick={() => lang !== l && setLang(l)}
               >
                 {l.toUpperCase()}
               </button>

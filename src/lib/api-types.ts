@@ -88,19 +88,17 @@ export type Stage3Response = { ok: true };
 
 // ── POST signup, stage "event": analytics ──────────────────────────────────
 
-// Event name → its `meta` payload.
+// Event name → its `meta` payload. One event per user outcome (no paired or per-field events).
 export type EventMeta = {
-  page_view: { path: string };
+  page_view: { path: string }; // once per page load
   lang_switch: { to: Lang };
-  cta_click: { source: string };
-  sheet_open: { source: string };
-  step1_submit: Record<string, never>;
-  step1_error: { field: string }; // form field, backend ErrorCode, or "network"
+  cta_click: { source: string }; // opens the signup sheet
+  step1_error: { fields: string[] }; // once per failed submit: invalid form fields, or [ErrorCode | "network"]
   step1_success: { city: CityKey };
   step2_submit: { trades: number; crew: CrewKey | null };
-  share_click: { method: "share" | "copy" };
+  share_click: { method: "share" | "copy" }; // what actually ran (share sheet, or clipboard fallback)
   demo_request: Record<string, never>;
-  thread_complete: Record<string, never>;
+  thread_complete: Record<string, never>; // first playthrough per page load
 };
 export type EventName = keyof EventMeta;
 

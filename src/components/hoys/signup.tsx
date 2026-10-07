@@ -190,10 +190,9 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     if (!isValidPhoneNumber(phone, "US")) er.phone = s.errPhone;
     if (!consent) er.consent = s.errConsent;
     setErrs(er);
-    track("step1_submit");
     const fields = Object.keys(er);
     if (fields.length) {
-      for (const field of fields) track("step1_error", { field });
+      track("step1_error", { fields });
       document.getElementById(`f-${fields[0]}`)?.focus();
       return;
     }
@@ -214,7 +213,7 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
       });
       if (!res.ok) {
         setErrs(res.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
-        track("step1_error", { field: res.error ?? "network" });
+        track("step1_error", { fields: [res.error ?? "network"] });
         return;
       }
       const picked = city as CityKey;
@@ -229,7 +228,7 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
       setStep(2);
     } catch {
       setErrs({ net: s.errNet });
-      track("step1_error", { field: "network" });
+      track("step1_error", { fields: ["network"] });
     } finally {
       setBusy(false);
     }
@@ -284,8 +283,8 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     }
   }
   async function share() {
+    if (!navigator.share) return copy(); // fallback tracks itself as "copy"
     track("share_click", { method: "share" });
-    if (!navigator.share) return copy();
     try {
       await navigator.share({ text: s.shareText, url: shareUrl });
     } catch {
