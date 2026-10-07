@@ -28,6 +28,15 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// MOCK_API_CALL=true (default false) → every request (incl. events' fetch adapter) is answered by src/lib/api-mock.ts.
+// Dynamic import keeps the mock out of production bundles.
+if (import.meta.env.MOCK_API_CALL?.toLowerCase() === "true") {
+  api.interceptors.request.use((config) => {
+    config.adapter = (c) => import("./api-mock").then((m) => m.mockAdapter(c));
+    return config;
+  });
+}
+
 function retryAfterMs(error: AxiosError) {
   const header = error.response?.headers["retry-after"];
   const seconds = Number(header);
