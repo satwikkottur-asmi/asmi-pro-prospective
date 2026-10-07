@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { track, useApp } from "@/lib/app-context";
-import { Button } from "@/components/ui/button";
+import { prefersReducedMotion } from "@/lib/motion";
 
 type Item = { k: "ts" | "in" | "out" | "stamp"; key: string; role?: number };
 
@@ -67,7 +67,7 @@ export function DayThread() {
   };
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (prefersReducedMotion()) {
       setShown(SCRIPT.length);
       return;
     }
@@ -78,7 +78,10 @@ export function DayThread() {
     const startWhenVisible = () => {
       if (started || !hasScrolled) return;
       const bounds = el.getBoundingClientRect();
-      const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0));
+      const visibleHeight = Math.max(
+        0,
+        Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0),
+      );
       if (visibleHeight < Math.min(bounds.height * 0.4, window.innerHeight * 0.5)) return;
       started = true;
       io.disconnect();
@@ -107,7 +110,7 @@ export function DayThread() {
 
   useEffect(() => {
     const thread = threadRef.current;
-    if (!thread || runId === 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!thread || runId === 0 || prefersReducedMotion()) return;
     thread.scrollTo({ top: thread.scrollHeight, behavior: shown === 0 ? "instant" : "smooth" });
   }, [shown, typing, runId]);
 
@@ -117,30 +120,42 @@ export function DayThread() {
     <div>
       <div className="phone" ref={ref}>
         <div className="ph-top">
-          <span className="av" aria-hidden>a</span>
+          <span className="av" aria-hidden>
+            a
+          </span>
           <div>
-            <b style={{ fontSize: 16, color: "var(--ink)" }}>Asmi</b>
-            <small style={{ display: "block", fontSize: 14, color: "var(--muted)" }}>{t.day.biz}</small>
+            <b>Asmi</b>
+            <small>{t.day.biz}</small>
           </div>
         </div>
         <ol className="thread" ref={threadRef} tabIndex={0} aria-label={t.day.h2}>
           {SCRIPT.map((it, i) => {
-            const visible = i < shown;
             const isTyping = typing === i;
-            if (!visible && !isTyping) return null;
-            const cls = !visible && !isTyping ? "hidden-slot" : "";
-            if (it.k === "ts") return <li key={i} className={`ts ${cls}`}>{it.key}</li>;
+            if (i >= shown && !isTyping) return null;
+            if (it.k === "ts")
+              return (
+                <li key={i} className="ts">
+                  {it.key}
+                </li>
+              );
             if (it.k === "stamp")
               return (
-                <li key={i} className={`stamp ${visible && runId ? "land" : ""} ${cls}`}>{m[it.key]}</li>
+                <li key={i} className={runId ? "stamp land" : "stamp"}>
+                  {m[it.key]}
+                </li>
               );
             return (
-              <li key={i} className={`bub ${it.k} ${cls}`} style={isTyping ? { visibility: "visible" } : undefined}>
+              <li key={i} className={`bub ${it.k}`}>
                 <span className="sr-only">{it.k === "in" ? "Asmi: " : `${t.day.you}: `}</span>
                 {isTyping ? (
                   <>
-                    <span style={{ visibility: "hidden", display: "block", height: 0, overflow: "hidden" }}>{m[it.key]}</span>
-                    <span className="dots" aria-hidden><i /><i /><i /></span>
+                    {/* Invisible copy sizes the typing bubble to the final message width. */}
+                    <span className="bub-sizer">{m[it.key]}</span>
+                    <span className="dots" aria-hidden>
+                      <i />
+                      <i />
+                      <i />
+                    </span>
                   </>
                 ) : (
                   m[it.key]
@@ -152,12 +167,16 @@ export function DayThread() {
       </div>
       <div className="roles" aria-hidden>
         {t.day.roles.map((r, i) => (
-          <span key={r} className={role === i ? "on" : ""}>{r}</span>
+          <span key={r} className={role === i ? "on" : ""}>
+            {r}
+          </span>
         ))}
       </div>
-      <div className="text-center" style={{ minHeight: 48 }}>
+      <div className="replay">
         {done && runId > 0 && (
-          <Button type="button" variant="link" className="linkbtn" onClick={play}>{t.day.replay}</Button>
+          <button type="button" className="linkbtn" onClick={play}>
+            {t.day.replay}
+          </button>
         )}
       </div>
     </div>

@@ -1,6 +1,15 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { dicts, type Dict, type Lang, type Variant } from "./dict";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type { CityKey } from "@/config";
+import { postEvent } from "./api";
+import { type Dict, dicts, type Lang, type Variant } from "./dict";
 
 type Ctx = {
   lang: Lang;
@@ -16,7 +25,13 @@ type Ctx = {
 
 const AppCtx = createContext<Ctx | null>(null);
 
-const CITY_PARAM: Record<string, CityKey> = { sf: "bay_area", bay: "bay_area", la: "los_angeles", ny: "new_york", nyc: "new_york" };
+const CITY_PARAM: Record<string, CityKey> = {
+  sf: "bay_area",
+  bay: "bay_area",
+  la: "los_angeles",
+  ny: "new_york",
+  nyc: "new_york",
+};
 
 export function resolveVariant(v?: string, src?: string): Variant {
   if (v === "a" || v === "b" || v === "c") return v;
@@ -34,7 +49,21 @@ function getSessionId() {
   return id;
 }
 
-export function getAttribution(): any {
+// First-touch attribution captured on landing and sent with the stage-1 signup.
+const ATTR_KEYS = [
+  "src",
+  "v",
+  "city",
+  "ref",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+] as const;
+export type Attribution = Partial<Record<(typeof ATTR_KEYS)[number] | "referrer", string>>;
+
+export function getAttribution(): Attribution {
   try {
     return JSON.parse(sessionStorage.getItem("asmi_attr") || "{}");
   } catch {
@@ -45,40 +74,47 @@ export function getAttribution(): any {
 let ctxSnapshot = { variant: "a" as Variant, lang: "en" as Lang };
 
 export function track(name: string, meta: Record<string, unknown> = {}) {
-  if (typeof window === "undefined") return;
   try {
     const attr = getAttribution();
-    fetch("/api/public/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      keepalive: true,
-      body: JSON.stringify({
-        stage: "event",
-        name,
-        session_id: getSessionId(),
-        variant: ctxSnapshot.variant,
-        src: attr.src || null,
-        lang: ctxSnapshot.lang,
-        meta,
-      }),
+    postEvent({
+      stage: "event",
+      name,
+      session_id: getSessionId(),
+      variant: ctxSnapshot.variant,
+      src: attr.src || null,
+      lang: ctxSnapshot.lang,
+      meta,
     }).catch(() => {});
   } catch {
     /* ignore */
   }
 }
 
-export function AppProvider({ children, search }: { children: ReactNode; search: { v?: string | undefined; src?: string | undefined; lang?: string | undefined; city?: string | undefined } }) {
+export function AppProvider({
+  children,
+  search,
+}: {
+  children: ReactNode;
+  search: {
+    v?: string | undefined;
+    src?: string | undefined;
+    lang?: string | undefined;
+    city?: string | undefined;
+  };
+}) {
   const variant = resolveVariant(search.v, search.src);
   const [lang, setLangState] = useState<Lang>(search.lang === "es" ? "es" : "en");
-  const [city, setCityState] = useState<CityKey | null>(search.city ? CITY_PARAM[search.city] ?? null : null);
+  const [city, setCityState] = useState<CityKey | null>(
+    search.city ? (CITY_PARAM[search.city] ?? null) : null,
+  );
   const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
     // Attribution: keep first-touch params for this session.
     const p = new URLSearchParams(window.location.search);
     if (!sessionStorage.getItem("asmi_attr")) {
-      const a: any = {};
-      for (const k of ["src", "v", "city", "ref", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]) {
+      const a: Attribution = {};
+      for (const k of ATTR_KEYS) {
         const val = p.get(k);
         if (val) a[k] = val.slice(0, 100);
       }
@@ -86,7 +122,10 @@ export function AppProvider({ children, search }: { children: ReactNode; search:
       sessionStorage.setItem("asmi_attr", JSON.stringify(a));
     }
     const stored = localStorage.getItem("asmi_lang") as Lang | null;
-    const initial: Lang = p.get("lang") === "es" ? "es" : stored ?? (navigator.language?.toLowerCase().startsWith("es") ? "es" : "en");
+    const initial: Lang =
+      p.get("lang") === "es"
+        ? "es"
+        : (stored ?? (navigator.language?.toLowerCase().startsWith("es") ? "es" : "en"));
     setLangState(initial);
     if (!city) {
       const sc = sessionStorage.getItem("asmi_city") as CityKey | null;
@@ -120,7 +159,17 @@ export function AppProvider({ children, search }: { children: ReactNode; search:
   const closeSheet = useCallback(() => setSheetOpen(false), []);
 
   const value = useMemo(
-    () => ({ lang, t: dicts[lang], setLang, variant, city, setCity, sheetOpen, openSheet, closeSheet }),
+    () => ({
+      lang,
+      t: dicts[lang],
+      setLang,
+      variant,
+      city,
+      setCity,
+      sheetOpen,
+      openSheet,
+      closeSheet,
+    }),
     [lang, setLang, variant, city, setCity, sheetOpen, openSheet, closeSheet],
   );
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

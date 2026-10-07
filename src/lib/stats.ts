@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { CITY_SPOTS, MIN_COUNT_TO_SHOW, RECENT_MIN, type CityKey } from "@/config";
+import { CITY_SPOTS, type CityKey, MIN_COUNT_TO_SHOW, RECENT_MIN } from "@/config";
+import { getStats } from "./api";
 
-// Counts include the owner's verified existing waitlist plus new confirmed rows.
+// Public waitlist counts from the backend; UI hides them until thresholds are met.
 export type Stats = {
   total: number;
   remaining: number;
@@ -13,13 +14,9 @@ export type Stats = {
 export function useStats() {
   return useQuery<Stats>({
     queryKey: ["stats"],
-    queryFn: async () => {
-      const r = await fetch("/api/public/stats");
-      if (!r.ok) throw new Error("stats");
-      return r.json();
-    },
+    queryFn: () => getStats<Stats>(),
     staleTime: 60_000,
-    retry: 1,
+    retry: false, // the API client already retries
   });
 }
 
@@ -31,4 +28,5 @@ export function spotsLeft(stats: Stats | undefined, city: CityKey | null): numbe
 }
 
 export const showCounts = (s?: Stats) => !!s && s.total >= MIN_COUNT_TO_SHOW;
-export const showRecent = (s?: Stats) => showCounts(s) && s!.recent7d >= RECENT_MIN && s!.recent.length > 0;
+export const showRecent = (s?: Stats) =>
+  showCounts(s) && s!.recent7d >= RECENT_MIN && s!.recent.length > 0;

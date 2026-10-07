@@ -7,10 +7,14 @@ function CompanyTicker({ label, names }: { label: string; names: string[] }) {
       <span className="sr-only">{names.join(", ")}</span>
       <span className="company-ticker" aria-hidden="true">
         <span className="company-ticker-track">
-          {[...names, names[0]].map((name, index) => <b key={`${name}-${index}`}>{name}</b>)}
+          {[...names, names[0]].map((name, index) => (
+            <b key={`${name}-${index}`}>{name}</b>
+          ))}
         </span>
       </span>
-      <b className="company-static" aria-hidden="true">{names.join(", ")}</b>
+      <b className="company-static" aria-hidden="true">
+        {names.join(", ")}
+      </b>
     </span>
   );
 }
@@ -27,10 +31,12 @@ export function CompanyProof() {
         </div>
       </div>
       <span className="sr-only">
-        {t.trust.teamLabel} {t.trust.teamNames.join(", ")}. {t.trust.backedLabel} {t.trust.backedNames.join(", ")}.
+        {t.trust.teamLabel} {t.trust.teamNames.join(", ")}. {t.trust.backedLabel}{" "}
+        {t.trust.backedNames.join(", ")}.
       </span>
       <div className="company-proof-static" aria-hidden="true">
-        <b>{t.trust.teamLabel}</b> {t.trust.teamNames.join(", ")}. <b>{t.trust.backedLabel}</b> {t.trust.backedNames.join(", ")}.
+        <b>{t.trust.teamLabel}</b> {t.trust.teamNames.join(", ")}. <b>{t.trust.backedLabel}</b>{" "}
+        {t.trust.backedNames.join(", ")}.
       </div>
     </div>
   );

@@ -9,46 +9,56 @@ const en = {
   },
   top: { textUs: "Text us", langLabel: "Language" },
   hero: {
-    eyebrow: "",
-    h1: { a: "Paid jobs. No lead fees.", b: "Paid jobs. No lead fees.", c: "Paid jobs. No lead fees." },
+    h1: {
+      a: "Paid jobs. No lead fees.",
+      b: "Paid jobs. No lead fees.",
+      c: "Paid jobs. No lead fees.",
+    },
     sub: "Customers pay first. Asmi handles office work by text or voice in 30+ languages.",
-    modes: "",
     chipTitle: "New paid job: AC tune-up",
     chipSub: "Thu 10 AM. You take home $255.",
     artAlt: "Riso illustration of a home service pro at work",
   },
   cta: "Join the waitlist",
-  checks: [],
   example: "EXAMPLE",
   live: {
-    remaining: (n: number) => n > 0 ? `Only ${n} spots left.` : "This group is full. Join for the next rollout.",
-    pros: (n: number) => `${n.toLocaleString("en-US")} pros on the list.`,
+    remaining: (n: number) =>
+      n > 0 ? `Only ${n} spots left.` : "This group is full. Join for the next rollout.",
     left: (n: number, c: string) => `${n} spots left in ${c}.`,
-    stickyLeft: (n: number, c: string) => `${n} founding spots left in ${c}`,
   },
   trust: {
     teamLabel: "Team from",
     teamNames: ["Meta", "Google", "Amazon"],
     backedLabel: "Backed by leaders at",
     backedNames: ["Snap", "Meta", "Google"],
-    team: ["Team from ", "Meta", " and ", "Google"],
-    backed: ["Backed by leaders at ", "Snap, Meta, Google"],
     aria: "See who is behind Asmi",
   },
   pain: {
     h2: "Sound familiar?",
-    items: ["Paying for leads that never call back.", "Quotes and invoices at 10 PM.", "Chasing customers to get paid."],
+    items: [
+      "Paying for leads that never call back.",
+      "Quotes and invoices at 10 PM.",
+      "Chasing customers to get paid.",
+    ],
     fix: "Asmi fixes all three.",
   },
   two: {
     h2: "Asmi does two things for you.",
     paidLabel: "Paid jobs",
     paidH3: "Jobs that are already paid for.",
-    paidList: ["The customer pays before you show up.", "One pro per job. You never pay for a lead.", "You see your take-home, then take it or pass."],
+    paidList: [
+      "The customer pays before you show up.",
+      "One pro per job. You never pay for a lead.",
+      "You see your take-home, then take it or pass.",
+    ],
     admit: "ADMIT ONE PRO",
     crewLabel: "AI crew",
     crewH3: "Help with the office work, by text or voice.",
-    crewList: ["Answers when you cannot and books the work.", "Prepares quotes from photos, moves your day and orders parts.", "Sends invoices and follows up on money owed—in 30+ languages."],
+    crewList: [
+      "Answers when you cannot and books the work.",
+      "Prepares quotes from photos, moves your day and orders parts.",
+      "Sends invoices and follows up on money owed—in 30+ languages.",
+    ],
     note: "Works on the customers you already have.",
     noteFree: " No charge on your own jobs.",
   },
@@ -96,7 +106,8 @@ const en = {
       ["You pay, win or lose", "From 15%, only on completed jobs"],
     ],
     whereQ: "Where do paid jobs come from?",
-    whereA: "More people now ask AI assistants to get things fixed at home. When they do, Asmi books a nearby pro, takes the payment first and holds it until the job is done.",
+    whereA:
+      "More people now ask AI assistants to get things fixed at home. When they do, Asmi books a nearby pro, takes the payment first and holds it until the job is done.",
   },
   how: {
     h2: "How it works",
@@ -109,12 +120,11 @@ const en = {
   team: {
     h2: "Who is behind Asmi",
     rishiRole: "Co-founder and CEO",
-    rishi: "Built Asia's largest tech platform for small store owners: 100,000+ shops. Backed by top investors and founders of DoorDash and Zoom.",
+    rishi:
+      "Built Asia's largest tech platform for small store owners: 100,000+ shops. Backed by top investors and founders of DoorDash and Zoom.",
     satwikRole: "Co-founder and CTO",
-    satwik: "Built AI systems at Meta (Facebook). PhD from Carnegie Mellon. Previously worked at Google.",
-    backedBy: "Backed by leaders at",
-    backers: [["Snap", ""], ["Meta", ""], ["Google", ""]],
-    quote: "From a pro",
+    satwik:
+      "Built AI systems at Meta (Facebook). PhD from Carnegie Mellon. Previously worked at Google.",
   },
   spots: {
     h2: "Founding spots are limited.",
@@ -133,7 +143,12 @@ const en = {
     new_york: "New York",
     other: "Somewhere else",
   },
-  citiesShort: { bay_area: "the Bay Area", los_angeles: "LA", new_york: "New York", other: "your area" },
+  citiesShort: {
+    bay_area: "the Bay Area",
+    los_angeles: "LA",
+    new_york: "New York",
+    other: "your area",
+  },
   final: { h2: "Paid jobs and an AI crew. Free to join." },
   footer: { questions: "Questions?", text: "Text" },
   sheet: {
@@ -149,7 +164,6 @@ const en = {
     otherCityPh: "City, state",
     consentBold: "I agree Asmi may text or call me about the waitlist.",
     saving: "Saving...",
-    under: "",
     errCity: "Pick where you work.",
     errName: "Add your name.",
     errPhone: "That number does not look right.",
@@ -159,17 +173,30 @@ const en = {
     s2h: "One last step.",
     s2sub: "Tell us what kind of work you do, then join the list.",
     trades: "Your trades",
-    tradeList: ["Plumbing", "Electrical", "HVAC", "Handyman", "Roofing", "General contractor", "Cleaning", "Other"],
+    tradeLabels: {
+      plumbing: "Plumbing",
+      electrical: "Electrical",
+      hvac: "HVAC",
+      handyman: "Handyman",
+      roofing: "Roofing",
+      general_contractor: "General contractor",
+      cleaning: "Cleaning",
+      other: "Other",
+    },
     whichTrade: "Which trade?",
     crew: "Crew size",
-    crewList: ["Just me", "2 to 5", "6 to 10", "More than 10"],
+    crewLabels: {
+      just_me: "Just me",
+      "2_5": "2 to 5",
+      "6_10": "6 to 10",
+      "10_plus": "More than 10",
+    },
     zip: "Zip code",
     biz: "Business name (optional)",
     email: "Email (optional)",
     errZip: "Zip codes have 5 digits.",
     errEmail: "That email does not look right.",
     save: "Join the waitlist",
-    skip: "",
     onList: "ON THE LIST",
     inCity: (c: string) => `in ${c}`,
     onTheList: "on the list",
@@ -178,7 +205,6 @@ const en = {
     step3: "Founding pros get paid jobs first.",
     knowPro: "Know a pro tired of paying for leads?",
     share: "Share link",
-    textIt: "",
     copy: "Copy link",
     copied: "Copied",
     shareText: "Asmi sends paid jobs to pros. No lead fees. Join the waitlist:",
@@ -188,8 +214,7 @@ const en = {
     callDone: "Done. Someone from Asmi will call you.",
   },
   // Exact consent text stored with each signup, in the language shown.
-  consentText:
-    "Asmi can text or call me about the waitlist.",
+  consentText: "Asmi can text or call me about the waitlist.",
 };
 
 export type Dict = typeof en;
@@ -201,46 +226,58 @@ const es: Dict = {
   },
   top: { textUs: "Escríbenos", langLabel: "Idioma" },
   hero: {
-    eyebrow: "",
-    h1: { a: "Trabajos pagados. Sin pagar por leads.", b: "Trabajos pagados. Sin pagar por leads.", c: "Trabajos pagados. Sin pagar por leads." },
+    h1: {
+      a: "Trabajos pagados. Sin pagar por leads.",
+      b: "Trabajos pagados. Sin pagar por leads.",
+      c: "Trabajos pagados. Sin pagar por leads.",
+    },
     sub: "El cliente paga primero. Asmi se encarga de la oficina por texto o voz en más de 30 idiomas.",
-    modes: "",
     chipTitle: "Nuevo trabajo pagado: mantenimiento de AC",
     chipSub: "Jue 10 AM. Te llevas $255.",
     artAlt: "Ilustración de un pro de servicios del hogar trabajando",
   },
   cta: "Únete a la lista",
-  checks: [],
   example: "EJEMPLO",
   live: {
-    remaining: (n: number) => n > 0 ? `Solo quedan ${n} lugares.` : "Este grupo está lleno. Únete para la próxima apertura.",
-    pros: (n: number) => `${n.toLocaleString("en-US")} pros en la lista.`,
+    remaining: (n: number) =>
+      n > 0
+        ? `Solo quedan ${n} lugares.`
+        : "Este grupo está lleno. Únete para la próxima apertura.",
     left: (n: number, c: string) => `Quedan ${n} lugares en ${c}.`,
-    stickyLeft: (n: number, c: string) => `Quedan ${n} lugares fundadores en ${c}`,
   },
   trust: {
     teamLabel: "Equipo de",
     teamNames: ["Meta", "Google", "Amazon"],
     backedLabel: "Respaldado por líderes en",
     backedNames: ["Snap", "Meta", "Google"],
-    team: ["Equipo de ", "Meta", " y ", "Google"],
-    backed: ["Respaldado por líderes en ", "Snap, Meta y Google"],
     aria: "Mira quién está detrás de Asmi",
   },
   pain: {
     h2: "¿Te suena?",
-    items: ["Pagar por leads que nunca te contestan.", "Cotizaciones y facturas a las 10 PM.", "Perseguir clientes para que te paguen."],
+    items: [
+      "Pagar por leads que nunca te contestan.",
+      "Cotizaciones y facturas a las 10 PM.",
+      "Perseguir clientes para que te paguen.",
+    ],
     fix: "Asmi arregla las tres.",
   },
   two: {
     h2: "Asmi hace dos cosas por ti.",
     paidLabel: "Trabajos pagados",
     paidH3: "Trabajos que ya están pagados.",
-    paidList: ["El cliente paga antes de que llegues.", "Un pro por trabajo. Nunca pagas por un lead.", "Ves lo que te llevas y decides si lo tomas o lo pasas."],
+    paidList: [
+      "El cliente paga antes de que llegues.",
+      "Un pro por trabajo. Nunca pagas por un lead.",
+      "Ves lo que te llevas y decides si lo tomas o lo pasas.",
+    ],
     admit: "ADMITE UN PRO",
     crewLabel: "Equipo de IA",
     crewH3: "Ayuda con la oficina, por texto o voz.",
-    crewList: ["Contesta cuando tú no puedes y agenda el trabajo.", "Prepara cotizaciones con fotos, mueve tu día y pide piezas.", "Manda facturas y cobra lo pendiente en más de 30 idiomas."],
+    crewList: [
+      "Contesta cuando tú no puedes y agenda el trabajo.",
+      "Prepara cotizaciones con fotos, mueve tu día y pide piezas.",
+      "Manda facturas y cobra lo pendiente en más de 30 idiomas.",
+    ],
     note: "Funciona con los clientes que ya tienes.",
     noteFree: " Sin costo en tus propios trabajos.",
   },
@@ -288,25 +325,28 @@ const es: Dict = {
       ["Pagas, ganes o pierdas", "Desde 15%, solo en trabajos terminados"],
     ],
     whereQ: "¿De dónde salen los trabajos pagados?",
-    whereA: "Cada vez más gente le pide a asistentes de IA que les arreglen cosas en casa. Cuando lo hacen, Asmi agenda a un pro cercano, cobra primero y guarda el pago hasta que se termina el trabajo.",
+    whereA:
+      "Cada vez más gente le pide a asistentes de IA que les arreglen cosas en casa. Cuando lo hacen, Asmi agenda a un pro cercano, cobra primero y guarda el pago hasta que se termina el trabajo.",
   },
   how: {
     h2: "Cómo funciona",
     steps: [
       ["Únete a la lista", "Dinos dónde trabajas y qué haces."],
       ["Te configuramos por texto", "Unos 15 minutos cuando abra tu zona."],
-      ["Empieza el equipo de IA. Luego llegan los trabajos pagados.", "Los pros fundadores reciben trabajos pagados primero."],
+      [
+        "Empieza el equipo de IA. Luego llegan los trabajos pagados.",
+        "Los pros fundadores reciben trabajos pagados primero.",
+      ],
     ],
   },
   team: {
     h2: "Quién está detrás de Asmi",
     rishiRole: "Cofundador y CEO",
-    rishi: "Construyó la plataforma tecnológica más grande de Asia para pequeños comerciantes: más de 100,000 tiendas. Respaldado por grandes inversionistas y los fundadores de DoorDash y Zoom.",
+    rishi:
+      "Construyó la plataforma tecnológica más grande de Asia para pequeños comerciantes: más de 100,000 tiendas. Respaldado por grandes inversionistas y los fundadores de DoorDash y Zoom.",
     satwikRole: "Cofundador y CTO",
-    satwik: "Construyó sistemas de IA en Meta (Facebook). Doctorado de Carnegie Mellon. Antes trabajó en Google.",
-    backedBy: "Respaldado por líderes en",
-    backers: [["Snap", ""], ["Meta", ""], ["Google", ""]],
-    quote: "De un pro",
+    satwik:
+      "Construyó sistemas de IA en Meta (Facebook). Doctorado de Carnegie Mellon. Antes trabajó en Google.",
   },
   spots: {
     h2: "Los lugares fundadores son limitados.",
@@ -325,7 +365,12 @@ const es: Dict = {
     new_york: "Nueva York",
     other: "Otro lugar",
   },
-  citiesShort: { bay_area: "el Bay Area", los_angeles: "LA", new_york: "Nueva York", other: "tu zona" },
+  citiesShort: {
+    bay_area: "el Bay Area",
+    los_angeles: "LA",
+    new_york: "Nueva York",
+    other: "tu zona",
+  },
   final: { h2: "Trabajos pagados y un equipo de IA. Gratis para unirte." },
   footer: { questions: "¿Preguntas?", text: "Texto" },
   sheet: {
@@ -341,7 +386,6 @@ const es: Dict = {
     otherCityPh: "Ciudad, estado",
     consentBold: "Acepto que Asmi me mande textos o llame sobre la lista de espera.",
     saving: "Guardando...",
-    under: "",
     errCity: "Escoge dónde trabajas.",
     errName: "Pon tu nombre.",
     errPhone: "Ese número no se ve bien.",
@@ -351,17 +395,30 @@ const es: Dict = {
     s2h: "Un último paso.",
     s2sub: "Dinos qué tipo de trabajo haces y luego únete a la lista.",
     trades: "Tus oficios",
-    tradeList: ["Plomería", "Electricidad", "HVAC", "Handyman", "Techos", "Contratista general", "Limpieza", "Otro"],
+    tradeLabels: {
+      plumbing: "Plomería",
+      electrical: "Electricidad",
+      hvac: "HVAC",
+      handyman: "Handyman",
+      roofing: "Techos",
+      general_contractor: "Contratista general",
+      cleaning: "Limpieza",
+      other: "Otro",
+    },
     whichTrade: "¿Cuál oficio?",
     crew: "Tamaño del equipo",
-    crewList: ["Solo yo", "2 a 5", "6 a 10", "Más de 10"],
+    crewLabels: {
+      just_me: "Solo yo",
+      "2_5": "2 a 5",
+      "6_10": "6 a 10",
+      "10_plus": "Más de 10",
+    },
     zip: "Código postal",
     biz: "Nombre del negocio (opcional)",
     email: "Email (opcional)",
     errZip: "El código postal tiene 5 dígitos.",
     errEmail: "Ese email no se ve bien.",
     save: "Únete a la lista",
-    skip: "",
     onList: "EN LA LISTA",
     inCity: (c: string) => `en ${c}`,
     onTheList: "en la lista",
@@ -370,7 +427,6 @@ const es: Dict = {
     step3: "Los pros fundadores reciben trabajos pagados primero.",
     knowPro: "¿Conoces a un pro cansado de pagar por leads?",
     share: "Compartir link",
-    textIt: "",
     copy: "Copiar link",
     copied: "Copiado",
     shareText: "Asmi manda trabajos pagados a pros. Sin pagar por leads. Únete a la lista:",
@@ -379,12 +435,7 @@ const es: Dict = {
     callBtn: "Sí, llámenme",
     callDone: "Listo. Alguien de Asmi te va a llamar.",
   },
-  consentText:
-    "Asmi me puede mandar textos o llamar sobre la lista de espera.",
+  consentText: "Asmi me puede mandar textos o llamar sobre la lista de espera.",
 };
-
-// Trade keys stored in the database (language independent).
-export const TRADE_KEYS = ["plumbing", "electrical", "hvac", "handyman", "roofing", "general_contractor", "cleaning", "other"] as const;
-export const CREW_KEYS = ["just_me", "2_5", "6_10", "10_plus"] as const;
 
 export const dicts: Record<Lang, Dict> = { en, es };
