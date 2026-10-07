@@ -29,7 +29,7 @@ Every failure is `{ "ok": false, "error": "<code>" }` with a 4xx/5xx status.
 |---|---|---|---|
 | `phone` | 400 | Not a valid US mobile number | "That number does not look right." on the phone field |
 | `name` · `city` · `service_city` · `consent` | 400 | Stage-1 validation | Generic "try again" (the frontend validates these first) |
-| `zip` · `email` | 400 | Stage-2 validation | Generic "try again" |
+| `zip` · `email` | 400 | Stage-2 validation | Field message: "Zip codes have 5 digits." / "That email does not look right." |
 | `token` | 400 / 404 | Malformed (not a UUID) / unknown token | Generic "try again" |
 | `stage` | 400 | Unknown `stage` | — |
 | `rate_limited` | 429 | Too many requests from this IP | Generic "try again" |

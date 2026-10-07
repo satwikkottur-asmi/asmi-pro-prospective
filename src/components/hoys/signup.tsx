@@ -259,7 +259,10 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
           email,
         });
         if (!res.ok) {
-          setErrs({ net: s.errNet });
+          // Backend field errors land on their field (same copy as client validation); rest → errNet.
+          if (res.error === "zip") setErrs({ zip: s.errZip });
+          else if (res.error === "email") setErrs({ email: s.errEmail });
+          else setErrs({ net: s.errNet });
           return;
         }
         const { position, city_position } = res.data;
