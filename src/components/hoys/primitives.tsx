@@ -1,5 +1,17 @@
 import type { ReactNode } from "react";
+import { BRAND } from "@/config";
 import { useApp } from "@/lib/app-context";
+
+// Brand name inside copy: bold ink like the logo; `mark` adds the lime highlighter (hero + headings).
+export function Brand({ mark }: { mark?: boolean | undefined }) {
+  return <span className={mark ? "brand marked" : "brand"}>{BRAND}</span>;
+}
+
+// Renders a dict string, swapping each `{brand}` placeholder for <Brand />.
+export function BrandText({ text, mark }: { text: string; mark?: boolean }) {
+  const parts = text.split("{brand}");
+  return <>{parts.flatMap((part, i) => (i ? [<Brand key={i} mark={mark} />, part] : [part]))}</>;
+}
 
 // Two-plate riso art: ink base plus an offset lime plate multiplied on top.
 export function Plate({
@@ -91,15 +103,15 @@ export function LiveLine({ children }: { children: ReactNode }) {
   );
 }
 
-// Primary CTA that opens the signup sheet, with the live spots line under it.
-export function JoinCta({ source, spots }: { source: string; spots: number }) {
+// Primary CTA that opens the signup sheet, with the live spots line under it (hidden until a real count arrives).
+export function JoinCta({ source, spots }: { source: string; spots: number | null }) {
   const { t, openSheet } = useApp();
   return (
     <div className="join-cta">
       <button type="button" className="btn" onClick={() => openSheet(source)}>
         {t.cta}
       </button>
-      <LiveLine>{t.live.remaining(spots)}</LiveLine>
+      {spots != null && <LiveLine>{t.live.remaining(spots)}</LiveLine>}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-- This repo is frontend-only. Waitlist signup, analytics events and stats go to an external backend through src/lib/api.ts (axios); the contract is docs/api.md. Keep the two in sync.
+- This repo is frontend-only. Waitlist signup, analytics events and stats go to an external backend through src/lib/api.ts (axios). Request/response types live in src/lib/api-types.ts and the prose contract in docs/backend_contracts.md; keep both in sync.
 - All page copy lives in src/lib/dict.ts (en/es) so both languages stay in sync.
 - Phone numbers are format-validated only (libphonenumber-js); there is no OTP/SMS verification yet.
 - Company proof uses one coordinated accessible ticker with a static reduced-motion fallback so labels and company names stay aligned.

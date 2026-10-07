@@ -39,6 +39,7 @@ export function DayThread() {
   const [role, setRole] = useState<number | null>(null);
   const [runId, setRunId] = useState(0);
   const timers = useRef<number[]>([]);
+  const completed = useRef(false); // thread_complete: first playthrough only, not replays
 
   const play = () => {
     timers.current.forEach(clearTimeout);
@@ -58,7 +59,10 @@ export function DayThread() {
           setTyping(-1);
           setShown(i + 1);
           if (it.role != null) setRole(it.role);
-          if (i === SCRIPT.length - 1) track("thread_complete");
+          if (i === SCRIPT.length - 1 && !completed.current) {
+            completed.current = true;
+            track("thread_complete");
+          }
         }, at),
       );
       at += it.k === "ts" ? 250 : 1400;
@@ -121,10 +125,10 @@ export function DayThread() {
       <div className="phone" ref={ref}>
         <div className="ph-top">
           <span className="av" aria-hidden>
-            a
+            h
           </span>
           <div>
-            <b>Asmi</b>
+            <b>Hoys</b>
             <small>{t.day.biz}</small>
           </div>
         </div>
@@ -146,7 +150,7 @@ export function DayThread() {
               );
             return (
               <li key={i} className={`bub ${it.k}`}>
-                <span className="sr-only">{it.k === "in" ? "Asmi: " : `${t.day.you}: `}</span>
+                <span className="sr-only">{it.k === "in" ? "Hoys: " : `${t.day.you}: `}</span>
                 {isTyping ? (
                   <>
                     {/* Invisible copy sizes the typing bubble to the final message width. */}

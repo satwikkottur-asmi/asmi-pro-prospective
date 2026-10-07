@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { CityKey } from "@/config";
 import { postEvent } from "./api";
+import { ATTR_KEYS, type Attribution, type EventMeta, type EventName } from "./api-types";
 import { type Dict, dicts, type Lang, type Variant } from "./dict";
 
 type Ctx = {
@@ -41,39 +42,31 @@ export function resolveVariant(v?: string, src?: string): Variant {
 }
 
 function getSessionId() {
-  let id = sessionStorage.getItem("asmi_sid");
+  let id = sessionStorage.getItem("hoys_sid");
   if (!id) {
     id = crypto.randomUUID();
-    sessionStorage.setItem("asmi_sid", id);
+    sessionStorage.setItem("hoys_sid", id);
   }
   return id;
 }
 
-// First-touch attribution captured on landing and sent with the stage-1 signup.
-const ATTR_KEYS = [
-  "src",
-  "v",
-  "city",
-  "ref",
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "utm_term",
-] as const;
-export type Attribution = Partial<Record<(typeof ATTR_KEYS)[number] | "referrer", string>>;
-
 export function getAttribution(): Attribution {
   try {
-    return JSON.parse(sessionStorage.getItem("asmi_attr") || "{}");
+    return JSON.parse(sessionStorage.getItem("hoys_attr") || "{}");
   } catch {
     return {};
   }
 }
 
 let ctxSnapshot = { variant: "a" as Variant, lang: "en" as Lang };
+// One page_view per page load (StrictMode remounts the provider in dev).
+let pageViewSent = false;
 
-export function track(name: string, meta: Record<string, unknown> = {}) {
+// Events without a payload take no meta argument; the rest require theirs (see EventMeta).
+export function track<N extends EventName>(
+  name: N,
+  ...[meta]: EventMeta[N] extends Record<string, never> ? [] : [meta: EventMeta[N]]
+) {
   try {
     const attr = getAttribution();
     postEvent({
@@ -83,7 +76,7 @@ export function track(name: string, meta: Record<string, unknown> = {}) {
       variant: ctxSnapshot.variant,
       src: attr.src || null,
       lang: ctxSnapshot.lang,
-      meta,
+      meta: meta ?? ({} as EventMeta[N]),
     }).catch(() => {});
   } catch {
     /* ignore */
@@ -110,29 +103,32 @@ export function AppProvider({
   const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
-    // Attribution: keep first-touch params for this session.
+    // Attribution: keep first-touch params for this session (sent with the stage-1 signup).
     const p = new URLSearchParams(window.location.search);
-    if (!sessionStorage.getItem("asmi_attr")) {
+    if (!sessionStorage.getItem("hoys_attr")) {
       const a: Attribution = {};
       for (const k of ATTR_KEYS) {
         const val = p.get(k);
         if (val) a[k] = val.slice(0, 100);
       }
       if (document.referrer) a.referrer = document.referrer.slice(0, 300);
-      sessionStorage.setItem("asmi_attr", JSON.stringify(a));
+      sessionStorage.setItem("hoys_attr", JSON.stringify(a));
     }
-    const stored = localStorage.getItem("asmi_lang") as Lang | null;
+    const stored = localStorage.getItem("hoys_lang") as Lang | null;
     const initial: Lang =
       p.get("lang") === "es"
         ? "es"
         : (stored ?? (navigator.language?.toLowerCase().startsWith("es") ? "es" : "en"));
     setLangState(initial);
     if (!city) {
-      const sc = sessionStorage.getItem("asmi_city") as CityKey | null;
+      const sc = sessionStorage.getItem("hoys_city") as CityKey | null;
       if (sc) setCityState(sc);
-    } else sessionStorage.setItem("asmi_city", city);
+    } else sessionStorage.setItem("hoys_city", city);
     ctxSnapshot = { variant, lang: initial };
-    track("page_view", { path: window.location.pathname });
+    if (!pageViewSent) {
+      pageViewSent = true;
+      track("page_view", { path: window.location.pathname });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -144,16 +140,15 @@ export function AppProvider({
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
-    localStorage.setItem("asmi_lang", l);
+    localStorage.setItem("hoys_lang", l);
     track("lang_switch", { to: l });
   }, []);
   const setCity = useCallback((c: CityKey) => {
     setCityState(c);
-    sessionStorage.setItem("asmi_city", c);
+    sessionStorage.setItem("hoys_city", c);
   }, []);
   const openSheet = useCallback((source: string) => {
     track("cta_click", { source });
-    track("sheet_open", { source });
     setSheetOpen(true);
   }, []);
   const closeSheet = useCallback(() => setSheetOpen(false), []);

@@ -30,7 +30,8 @@ type Errs = Partial<Record<Field, string>>;
 type Saved = {
   token: string | null;
   ref_code: string | null;
-  position: number | null;
+  position: number | null; // overall waitlist place
+  cityPosition: number | null; // place within `city`, when the backend sends it
   city: CityKey;
 };
 
@@ -190,41 +191,47 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     if (!isValidPhoneNumber(phone, "US")) er.phone = s.errPhone;
     if (!consent) er.consent = s.errConsent;
     setErrs(er);
-    track("step1_submit");
     const fields = Object.keys(er);
     if (fields.length) {
-      for (const field of fields) track("step1_error", { field });
+      track("step1_error", { fields });
       document.getElementById(`f-${fields[0]}`)?.focus();
       return;
     }
     setBusy(true);
+    const picked = city as CityKey;
     try {
-      const { ok, data } = await postSignup<{ token: string; ref_code: string }>({
+      const res = await postSignup({
         stage: 1,
-        city,
+        city: picked,
         service_city: serviceCity,
         name,
         phone,
-        consent,
+        consent: true,
         lang,
         variant,
         hp,
         consent_text: t.consentText,
         attribution: getAttribution(),
       });
-      if (!ok) {
-        setErrs(data.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
-        track("step1_error", { field: data.error || "network" });
+      if (!res.ok) {
+        setErrs(res.error === "phone" ? { phone: s.errPhone } : { net: s.errNet });
+        // Request landed but no error code (e.g. 502 HTML) → "unknown", not "network".
+        track("step1_error", { fields: [res.error ?? "unknown"] });
         return;
       }
-      const picked = city as CityKey;
       setCity(picked);
-      setSaved({ token: data.token, ref_code: data.ref_code, position: null, city: picked });
+      setSaved({
+        token: res.data.token,
+        ref_code: res.data.ref_code,
+        position: null,
+        cityPosition: null,
+        city: picked,
+      });
       track("step1_success", { city: picked });
       setStep(2);
     } catch {
       setErrs({ net: s.errNet });
-      track("step1_error", { field: "network" });
+      track("step1_error", { fields: ["network"] });
     } finally {
       setBusy(false);
     }
@@ -241,7 +248,7 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     track("step2_submit", { trades: trades.length, crew });
     try {
       if (saved?.token) {
-        const { ok, data } = await postSignup<{ position?: number }>({
+        const res = await postSignup({
           stage: 2,
           token: saved.token,
           trades,
@@ -251,11 +258,15 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
           business_name: biz,
           email,
         });
-        if (!ok) {
-          setErrs({ net: s.errNet });
+        if (!res.ok) {
+          // Backend field errors land on their field (same copy as client validation); rest → errNet.
+          if (res.error === "zip") setErrs({ zip: s.errZip });
+          else if (res.error === "email") setErrs({ email: s.errEmail });
+          else setErrs({ net: s.errNet });
           return;
         }
-        setSaved((cur) => (cur ? { ...cur, position: data.position ?? null } : cur));
+        const { position, city_position } = res.data;
+        setSaved((cur) => (cur ? { ...cur, position, cityPosition: city_position ?? null } : cur));
       }
       setStep(3);
     } catch {
@@ -278,8 +289,8 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
     }
   }
   async function share() {
+    if (!navigator.share) return copy(); // fallback tracks itself as "copy"
     track("share_click", { method: "share" });
-    if (!navigator.share) return copy();
     try {
       await navigator.share({ text: s.shareText, url: shareUrl });
     } catch {
@@ -480,9 +491,22 @@ export function SignupFlow({ onClose }: { onClose?: () => void }) {
             <Plate base={callBase} lime={callLime} alt="" w={720} h={518} eager />
             <span className="stamp">{s.onList}</span>
           </div>
+          {/* Big number = overall waitlist place; smaller line = place in the picked city.
+              No position (e.g. honeypot) → fall back to "on the list" / "in <city>". */}
           <div className="done-status">
-            {saved.position != null && <b className="tnum">#{saved.position}</b>}
-            <span>{saved.city === "other" ? s.onTheList : s.inCity(t.cities[saved.city])}</span>
+            {saved.position != null ? (
+              <>
+                <b className="tnum">#{saved.position}</b>
+                <span>{s.onWaitlist}</span>
+              </>
+            ) : (
+              <span>{saved.city === "other" ? s.onTheList : s.inCity(t.cities[saved.city])}</span>
+            )}
+            {saved.cityPosition != null && saved.city !== "other" && (
+              <p className="done-city tnum">
+                {s.cityRank(saved.cityPosition, t.cities[saved.city])}
+              </p>
+            )}
           </div>
           <ol className="dashrows">
             {[

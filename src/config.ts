@@ -20,7 +20,9 @@ export type LaunchCity = (typeof LAUNCH_CITIES)[number];
 export type TradeKey = (typeof TRADE_KEYS)[number];
 export type CrewKey = (typeof CREW_KEYS)[number];
 
-export const SUPPORT_EMAIL = "support@asmiai.com";
+// Styled (highlighter) brand mentions only: `{brand}` in dict.ts → BrandText. Plain copy hardcodes "Hoys".
+export const BRAND = "Hoys";
+export const SUPPORT_EMAIL = "support@hoys.ai";
 export const SUPPORT_TEXT_NUMBER = ""; // US number pros can text; hidden when empty
 export const CITY_SPOTS: Record<LaunchCity, number | null> = {
   bay_area: null,
@@ -28,7 +30,9 @@ export const CITY_SPOTS: Record<LaunchCity, number | null> = {
   new_york: null,
 }; // real founding caps
 export const MIN_COUNT_TO_SHOW = 100;
-export const RECENT_MIN = 5;
+// Ticking promo counter in landing.tsx (spots count down from backend `remaining`, random city
+// joins, saved in localStorage). Off for now → "spots left" shows backend `remaining` as-is.
+export const PROMO_COUNTER = false;
 export const REFERRAL_BUMP = 0;
 export const COMMISSION_START_PERCENT = 15;
 export const NEXT_STEPS_TIMING = "";
