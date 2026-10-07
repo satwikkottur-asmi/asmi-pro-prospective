@@ -49,13 +49,15 @@ function respond(body: SignupRequest): Reply {
 
 export async function mockAdapter(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
   let status = 200;
-  let data: unknown = STATS;
+  // Copy, not the live object: stage 2 mutates STATS, and React Query must see a new reference.
+  let data: unknown = structuredClone(STATS);
   if (config.method === "post") {
     const body: SignupRequest = JSON.parse(String(config.data));
     [status, data] = respond(body);
     if (body.stage !== "event") console.debug("[mock api]", config.url, body, "→", status, data);
-    await new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
   }
+  // Every request, GETs too → the "hidden until stats load" state shows in mock mode.
+  await new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
   const response: AxiosResponse = { data, status, statusText: String(status), headers: {}, config };
   // Like the real adapters: non-2xx rejects so the retry interceptor and postSignup see an error.
   if (status >= 400)
