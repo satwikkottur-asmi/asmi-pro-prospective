@@ -26,8 +26,9 @@ import { DayThread } from "./day-thread";
 import { BrandText, CheckList, JoinCta, LiveLine, Plate, Section } from "./primitives";
 import { SignupSheet } from "./signup";
 
-// Promotional counters tick every 10s (frozen under reduced motion).
-const PROMO_TICK_MS = 10_000;
+// Promotional counters tick at a random 10–20s interval (frozen under reduced motion).
+const PROMO_TICK_MIN_MS = 10_000;
+const PROMO_TICK_MAX_MS = 20_000;
 const PROMO_SPOTS_START = 486;
 const PROMO_SPOTS_END = 400;
 const CITY_JOIN_BASE: Record<LaunchCity, number> = {
@@ -445,8 +446,17 @@ function usePromoTick() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    const timer = window.setInterval(() => setTick((n) => n + 1), PROMO_TICK_MS);
-    return () => window.clearInterval(timer);
+    // Chained timeouts so each tick gets a fresh random delay.
+    let timer: number;
+    const schedule = () => {
+      const delay = PROMO_TICK_MIN_MS + Math.random() * (PROMO_TICK_MAX_MS - PROMO_TICK_MIN_MS);
+      timer = window.setTimeout(() => {
+        setTick((n) => n + 1);
+        schedule();
+      }, delay);
+    };
+    schedule();
+    return () => window.clearTimeout(timer);
   }, []);
   return tick;
 }
