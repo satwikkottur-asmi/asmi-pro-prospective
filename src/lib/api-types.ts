@@ -33,6 +33,7 @@ export type ErrorCode =
 export type ApiError = { ok: false; error?: ErrorCode };
 
 // First-touch URL params captured on landing (values ≤100 chars; referrer ≤300).
+// Plus `landing_path`: path landed on, incl. short links ("/pros"; see short-link.ts).
 export const ATTR_KEYS = [
   "src",
   "v",
@@ -44,7 +45,9 @@ export const ATTR_KEYS = [
   "utm_content",
   "utm_term",
 ] as const;
-export type Attribution = Partial<Record<(typeof ATTR_KEYS)[number] | "referrer", string>>;
+export type Attribution = Partial<
+  Record<(typeof ATTR_KEYS)[number] | "referrer" | "landing_path", string>
+>;
 
 // ── POST signup, stage 1: create or update the draft ───────────────────────
 
@@ -95,7 +98,7 @@ export type Stage3Response = { ok: true };
 
 // Event name → its `meta` payload. One event per user outcome (no paired or per-field events).
 export type EventMeta = {
-  page_view: { path: string }; // once per page load
+  page_view: { path: string }; // once per page load; landing path, incl. short links ("/pros")
   lang_switch: { to: Lang };
   cta_click: { source: string }; // opens the signup sheet
   step1_error: { fields: string[] }; // once per failed submit: invalid form fields, or [ErrorCode | "unknown" | "network"]

@@ -41,5 +41,9 @@ export const SHOW_FOUNDER_PHOTOS = true;
 export const HAS_PRO_QUOTE = false;
 export const PRO_QUOTE = { text: "", name: "", trade: "", city: "" };
 
+// Short links: hoys.ai/<tag> → home page; page_view still records the landing path (e.g. "/pros").
+// Add a tag here to create a new link (lowercase; matched case-insensitively, trailing slash ok).
+export const LINK_TAGS: readonly string[] = ["pros"];
+
 // Public site URL used in share links. Falls back to the current origin.
 export const SITE_URL = "";

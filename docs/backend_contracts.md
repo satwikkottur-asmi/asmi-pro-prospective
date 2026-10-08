@@ -64,7 +64,7 @@ Sent when the user submits name, phone and city.
   "attribution": {
     "src": "fb", "v": "c", "city": "sf", "ref": "AB12CD34",
     "utm_source": "…", "utm_medium": "…", "utm_campaign": "…", "utm_content": "…", "utm_term": "…",
-    "referrer": "https://…"
+    "referrer": "https://…", "landing_path": "/pros"
   }
 }
 ```
@@ -80,7 +80,7 @@ Sent when the user submits name, phone and city.
 | `lang` | `en` \| `es` | Anything else → `en` |
 | `variant` | `a` \| `b` \| `c` | Landing-page A/B variant (≤4) |
 | `hp` | string | Honeypot. **Non-empty → bot:** return `200 { ok: true, token: null, ref_code: null, city }` and store nothing |
-| `attribution` | object, all keys optional | First-touch URL params. Values ≤100 (`ref` ≤16, `src` ≤40, `referrer` ≤300). Stored **on insert only** |
+| `attribution` | object, all keys optional | First-touch URL params, plus `landing_path` (path landed on, incl. short links: `hoys.ai/pros` → `"/pros"`). Values ≤100 (`ref` ≤16, `src` ≤40, `referrer` ≤300). Stored **on insert only** |
 
 **Response 200**
 
@@ -91,7 +91,7 @@ Sent when the user submits name, phone and city.
 - `token`: UUID, the edit token for stages 2 and 3 (null only for honeypot hits)
 - `ref_code`: 8 chars from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`. The frontend builds the share link `<site>/?ref=<ref_code>` from it
 - **Upsert by phone (E.164):** an existing number updates its fields and keeps its `token`/`ref_code`; a new number generates both
-- Also store: `user_agent` (≤300), `src`, the `utm_*` fields and `referrer` from attribution; `referred_by` = `attribution.ref`
+- Also store: `user_agent` (≤300), `src`, the `utm_*` fields, `referrer` and `landing_path` from attribution; `referred_by` = `attribution.ref`
 - Rate limit: 10 signup requests per IP per 10 min → `429 rate_limited`
 
 ## `POST /prospective/pro/signup/` — stage 2: confirm
@@ -165,7 +165,7 @@ Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately 
 
 | `name` | `meta` | Fired when |
 |---|---|---|
-| `page_view` | `{ path }` | Once per page load (in-site navigation doesn't resend) |
+| `page_view` | `{ path }` | Once per page load (in-site navigation doesn't resend). `path` = where the visitor landed, incl. short links: `hoys.ai/pros` → `"/pros"` though the page shows `/` (`LINK_TAGS` in `config.ts`; tags lowercased, `/PROS/` → `"/pros"`) |
 | `lang_switch` | `{ to: "en" \| "es" }` | Language actually changed (re-clicking the active one sends nothing) |
 | `cta_click` | `{ source }` (`hero`, `final`) | "Join the waitlist" button; it also opens the signup sheet |
 | `step1_error` | `{ fields: string[] }` | Once per failed step-1 submit: the invalid form fields, or `[<ErrorCode>]`, `["unknown"]` (HTTP error without a code) / `["network"]` (no response) |

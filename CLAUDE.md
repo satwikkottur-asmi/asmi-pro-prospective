@@ -26,6 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Routing** — `src/routes.tsx` (React Router data routes); page/shell components in `src/components/hoys/pages.tsx`
   - `RootLayout`: feeds URL params to `AppProvider`, restores scroll; `RouteError` + `NotFound` render `StatusPage`
   - `/` → `Landing`, `/join` → standalone `SignupFlow`, `*` → 404
+  - Short links: `LINK_TAGS` in `config.ts` (`/pros` → `/`); `applyShortLink()` (`src/lib/short-link.ts`) runs before the router; `page_view.path` + `attribution.landing_path` keep `/pros`
   - `vercel.json` rewrites every path to `index.html` so deep links work
   - Page `<title>` follows the language (`dict.meta.title`, set in `app-context.tsx`)
 - **App state** — `src/lib/app-context.tsx`
