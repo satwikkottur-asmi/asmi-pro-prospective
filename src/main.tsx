@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { checkHealth } from "./lib/api";
+import { applyShortLink } from "./lib/app-context";
 import { routes } from "./routes";
 
 // Dev only: say early when the local backend is down instead of failing on the first signup.
@@ -18,6 +19,7 @@ if (import.meta.env.DEV && import.meta.env.MOCK_API_CALL !== "true") {
   });
 }
 
+applyShortLink(); // before the router reads the URL
 const queryClient = new QueryClient();
 const router = createBrowserRouter(routes);
 

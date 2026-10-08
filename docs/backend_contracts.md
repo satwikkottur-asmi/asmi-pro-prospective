@@ -165,7 +165,7 @@ Fire-and-forget: `keepalive`, never retried, response ignored. Sent immediately 
 
 | `name` | `meta` | Fired when |
 |---|---|---|
-| `page_view` | `{ path }` | Once per page load (in-site navigation doesn't resend) |
+| `page_view` | `{ path }` | Once per page load (in-site navigation doesn't resend). `path` = where the visitor landed, incl. short links: `hoys.ai/pros` → `"/pros"` though the page shows `/` (`LINK_TAGS` in `config.ts`) |
 | `lang_switch` | `{ to: "en" \| "es" }` | Language actually changed (re-clicking the active one sends nothing) |
 | `cta_click` | `{ source }` (`hero`, `final`) | "Join the waitlist" button; it also opens the signup sheet |
 | `step1_error` | `{ fields: string[] }` | Once per failed step-1 submit: the invalid form fields, or `[<ErrorCode>]`, `["unknown"]` (HTTP error without a code) / `["network"]` (no response) |

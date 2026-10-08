@@ -95,7 +95,7 @@ export type Stage3Response = { ok: true };
 
 // Event name → its `meta` payload. One event per user outcome (no paired or per-field events).
 export type EventMeta = {
-  page_view: { path: string }; // once per page load
+  page_view: { path: string }; // once per page load; landing path, incl. short links ("/pros")
   lang_switch: { to: Lang };
   cta_click: { source: string }; // opens the signup sheet
   step1_error: { fields: string[] }; // once per failed submit: invalid form fields, or [ErrorCode | "unknown" | "network"]
