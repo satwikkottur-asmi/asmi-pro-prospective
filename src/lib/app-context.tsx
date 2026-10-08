@@ -7,10 +7,11 @@ import {
   useMemo,
   useState,
 } from "react";
-import { type CityKey, LINK_TAGS } from "@/config";
+import type { CityKey } from "@/config";
 import { postEvent } from "./api";
 import { ATTR_KEYS, type Attribution, type EventMeta, type EventName } from "./api-types";
 import { type Dict, dicts, type Lang, type Variant } from "./dict";
+import { getEntryPath } from "./short-link";
 
 type Ctx = {
   lang: Lang;
@@ -59,19 +60,6 @@ export function getAttribution(): Attribution {
 }
 
 let ctxSnapshot = { variant: "a" as Variant, lang: "en" as Lang };
-let entryPath = ""; // path the visitor landed on, before any short-link rewrite
-
-// Short links (LINK_TAGS): /pros → "/" in place (no reload; query + hash kept).
-// - Call before the router starts, so it renders the home page
-// - The original path is kept for page_view
-export function applyShortLink() {
-  entryPath = window.location.pathname;
-  const tag = entryPath.replace(/^\/+|\/+$/g, "").toLowerCase();
-  if (LINK_TAGS.includes(tag)) {
-    const { search, hash } = window.location;
-    window.history.replaceState(window.history.state, "", `/${search}${hash}`);
-  }
-}
 // One page_view per page load (StrictMode remounts the provider in dev).
 let pageViewSent = false;
 
@@ -125,6 +113,7 @@ export function AppProvider({
         if (val) a[k] = val.slice(0, 100);
       }
       if (document.referrer) a.referrer = document.referrer.slice(0, 300);
+      a.landing_path = getEntryPath().slice(0, 100);
       sessionStorage.setItem("hoys_attr", JSON.stringify(a));
     }
     const stored = localStorage.getItem("hoys_lang") as Lang | null;
@@ -140,7 +129,7 @@ export function AppProvider({
     ctxSnapshot = { variant, lang: initial };
     if (!pageViewSent) {
       pageViewSent = true;
-      track("page_view", { path: entryPath || window.location.pathname });
+      track("page_view", { path: getEntryPath() });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

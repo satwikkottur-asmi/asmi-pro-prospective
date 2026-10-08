@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { checkHealth } from "./lib/api";
-import { applyShortLink } from "./lib/app-context";
+import { applyShortLink } from "./lib/short-link";
 import { routes } from "./routes";
 
 // Dev only: say early when the local backend is down instead of failing on the first signup.
